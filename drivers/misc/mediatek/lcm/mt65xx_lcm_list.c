@@ -980,6 +980,11 @@ LCM_DRIVER *lcm_driver_list[] = {
 #if defined(B080UAN01_2_WUXGA_DSI_VDO)
 	&b080uan01_2_wuxga_dsi_vdo_lcm_drv,
 #endif
+
+#if defined(HX8394D_BLD_CMI)
+	&hx8394d_bld_cmi,
+#endif
+
 #endif
 };
 
@@ -1012,6 +1017,7 @@ unsigned char lcm_name_list[][128] = {
 #if defined(R63417_FHD_DSI_VDO_TRULY_NT50358)
 	"r63417_fhd_dsi_vdo_truly_nt50358_drv",
 #endif
+
 };
 #endif
 

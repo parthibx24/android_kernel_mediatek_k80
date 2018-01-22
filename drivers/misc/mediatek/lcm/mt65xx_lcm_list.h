@@ -253,6 +253,8 @@ extern LCM_DRIVER r69429_wqxga_dsi_vdo_lcm_drv;
 extern LCM_DRIVER hx8394c_wxga_dsi_vdo_lcm_drv;
 extern LCM_DRIVER nt35595_truly_fhd_dsi_vdo_lcm_drv;
 extern LCM_DRIVER b080uan01_2_wuxga_dsi_vdo_lcm_drv;
+
+extern LCM_DRIVER hx8394d_bld_cmi;
 #endif
 
 #ifdef BUILD_LK
