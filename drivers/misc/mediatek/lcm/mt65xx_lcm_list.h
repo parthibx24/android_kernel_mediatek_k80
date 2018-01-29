@@ -256,6 +256,7 @@ extern LCM_DRIVER b080uan01_2_wuxga_dsi_vdo_lcm_drv;
 
 extern LCM_DRIVER hx8394d_bld_cmi;
 extern LCM_DRIVER hx8394f_bld_cmi;
+extern LCM_DRIVER r69339_sampl;
 
 #endif
 
