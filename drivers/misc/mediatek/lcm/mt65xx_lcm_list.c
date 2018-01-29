@@ -985,6 +985,10 @@ LCM_DRIVER *lcm_driver_list[] = {
 	&hx8394d_bld_cmi,
 #endif
 
+#if defined(HX8394F_BLD_CMI)
+	&hx8394f_bld_cmi,
+#endif
+
 #endif
 };
 
