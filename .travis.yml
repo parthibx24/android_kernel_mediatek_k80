@@ -1,0 +1,28 @@
+language: C
+dist: trusty
+before_install:
+  - git clone https://github.com/ArchiDroid/Toolchain.git -b linaro-4.9 toolchain
+  - export CROSS_COMPILE=$PWD/toolchain/bin/arm-eabi-
+  - sudo apt-get -qq update
+  - sudo apt-get install -y build-essential kernel-package libncurses5-dev bzip2
+
+# we're not installing anything
+install: true
+
+script:
+  #- chmod +x $PWD/tools/dct/DrvGen
+  #- chmod +x Build.sh
+  - mkdir -p out
+  - export ARCH=arm ARCH_MTK_PLATFORM=mt6580
+  - make -C $PWD O=$PWD/out ARCH=arm vsun6580_we_m_defconfig
+  - make -j8 -C $PWD O=$PWD/out ARCH=arm
+  - cp out/arch/arm/boot/zImage-dtb zImage-vsun6580-$(date +%Y%b%d%H%M)
+  - curl --upload-file zImage-vs* https://transfer.sh
+
+deploy:
+  provider: releases
+  file: "$PWD/out/arch/arm/boot/zImage-dtb"
+  #skip_cleanup: true
+  on:
+    tags: true
+    all_branches: true
