@@ -97,8 +97,8 @@
 };
 &msdc1_ins {
 	interrupt-parent = <&eintc>;
-	interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
-	debounce = <3 1000>;
+	interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
+	debounce = <10 1000>;
 	status = "okay";
 };
 &touch {

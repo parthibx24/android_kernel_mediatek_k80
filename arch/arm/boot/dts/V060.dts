@@ -239,7 +239,7 @@
 	};
 	mmc1_pins_insert_cfg: mmc1_ins_cfg {
 		pins_insert {
-			pins = <PINMUX_GPIO3__FUNC_EINT3>;
+			pins = <PINMUX_GPIO10__FUNC_EINT10>;
 			input-schmitt-enable =<1>;
 			slew-rate = <0>;
 			bias-pull-up =<00>;
