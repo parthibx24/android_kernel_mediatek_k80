@@ -359,6 +359,9 @@ chosen {
 	pinctrl-3 = <&ctp_pins_eint_output1>;
 	pinctrl-4 = <&ctp_pins_rst_output0>;
 	pinctrl-5 = <&ctp_pins_rst_output1>;
+	interrupt-parent = <&eintc>;
+	interrupts = <4 IRQ_TYPE_LEVEL_HIGH>;
+	debounce = <4 0>;
 	status = "okay";
 };
 &pio {
@@ -366,21 +369,21 @@ chosen {
 	};
 	ctp_pins_eint_as_int: toucheint@5 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO5__FUNC_EINT5>;
+			pins = <PINMUX_GPIO4__FUNC_EINT4>;
 			slew-rate = <0>;
 			bias-disable;
 		};
 	};
 	ctp_pins_eint_output0: eintoutput0 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO5__FUNC_GPIO5>;
+			pins = <PINMUX_GPIO4__FUNC_GPIO4>;
 			slew-rate = <1>;
 			output-low;
 		};
 	};
 	ctp_pins_eint_output1: eintoutput1 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO5__FUNC_GPIO5>;
+			pins = <PINMUX_GPIO4__FUNC_GPIO4>;
 			slew-rate = <1>;
 			output-high;
 		};
