@@ -103,8 +103,8 @@
 };
 &touch {
 	interrupt-parent = <&eintc>;
-	interrupts = <5 IRQ_TYPE_EDGE_FALLING>;
-	debounce = <5 0>;
+	interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
+	debounce = <4 0>;
 	status = "okay";
 };
 &alsps_mtk {
