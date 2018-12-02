@@ -924,6 +924,11 @@ LCM_DRIVER *lcm_driver_list[] = {
 #if defined(B080UAN01_2_WUXGA_DSI_VDO)
 	&b080uan01_2_wuxga_dsi_vdo_lcm_drv,
 #endif
+
+#if defined(HX8394D_BLD_CMI)
+    &hx8394d_bld_cmi_lcm_drv,
+#endif
+
 #endif
 };
 
