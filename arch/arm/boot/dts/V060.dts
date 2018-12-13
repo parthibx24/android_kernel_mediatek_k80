@@ -1,7 +1,7 @@
 
 /dts-v1/;
 
-#include "mt6580.dtsi"
+#include "V060/mt6580.dtsi"
 
 / {
 	memory@80000000 {
