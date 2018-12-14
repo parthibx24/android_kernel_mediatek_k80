@@ -27,9 +27,9 @@
 };
 
 &i2c1 {
-	CAP_TOUCH@5D {
+	CAP_TOUCH@38 {
 		compatible = "mediatek,CAP_TOUCH";
-		reg = <0x5D>;
+		reg = <0x38>;
 	};
 
 	EXT_BUCK@60 {
