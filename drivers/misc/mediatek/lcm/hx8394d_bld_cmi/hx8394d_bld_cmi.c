@@ -235,8 +235,8 @@ static unsigned int lcm_compare_id(void) {
     data_array[1] = 0x9483FFB9;
     dsi_set_cmdq(data_array, 2, 1);
 
-    data_array[16] = 0x33700;
-    dsi_set_cmdq(&data_array[16], 1, 1);
+    data_array[0] = 0x33700;
+    dsi_set_cmdq(data_array, 1, 1);
 
     read_reg_v2(0x04, buffer, 3);
 
