@@ -61,9 +61,9 @@
 		reg = <0x68>;
 		status = "okay";
 	};
-	alsps_mtk:alsps@60 {
+	alsps_mtk:alsps@49 {
 		compatible = "mediatek,alsps";
-		reg = <0x60>;
+		reg = <0x49>;
 		status = "okay";
 	};
 };
