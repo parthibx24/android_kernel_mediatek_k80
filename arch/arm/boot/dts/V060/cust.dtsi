@@ -41,7 +41,7 @@
 	debounce = <4 0>;
 	status = "okay";
 };
-&als {
+&alsps {
 	interrupt-parent = <&eintc>;
 	interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
 	debounce = <6 0>;
@@ -302,9 +302,9 @@
 		reg = <0x68>;
 		status = "okay";
 	};
-	alsps@60 {
+	alsps@49 {
 		compatible = "mediatek,alsps";
-		reg = <0x60>;
+		reg = <0x49>;
 		status = "okay";
 	};
 };
