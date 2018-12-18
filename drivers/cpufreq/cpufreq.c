@@ -28,10 +28,11 @@
 #include <linux/slab.h>
 #include <linux/suspend.h>
 #include <linux/tick.h>
-#ifdef CONFIG_SMP
-#include <linux/sched.h>
-#endif
 #include <trace/events/power.h>
+
+#ifdef CONFIG_ARCH_MT6797
+#include "../misc/mediatek/base/power/mt6797/mt_cpufreq.h"
+#endif
 
 /**
  * The "cpufreq driver" - the arch- or hardware-dependent low
@@ -287,53 +288,16 @@ static inline void adjust_jiffies(unsigned long val, struct cpufreq_freqs *ci)
 }
 #endif
 
-/*********************************************************************
- *               FREQUENCY INVARIANT CPU CAPACITY                    *
- *********************************************************************/
+void __weak arch_scale_set_curr_freq(int cpu, unsigned long freq) {}
 
-static DEFINE_PER_CPU(unsigned long, freq_scale) = SCHED_CAPACITY_SCALE;
-static DEFINE_PER_CPU(unsigned long, max_freq_scale) = SCHED_CAPACITY_SCALE;
-
-static void
-scale_freq_capacity(struct cpufreq_policy *policy, struct cpufreq_freqs *freqs)
-{
-	unsigned long cur = freqs ? freqs->new : policy->cur;
-	unsigned long scale = (cur << SCHED_CAPACITY_SHIFT) / policy->max;
-	struct cpufreq_cpuinfo *cpuinfo = &policy->cpuinfo;
-	int cpu;
-
-	pr_debug("cpus %*pbl cur/cur max freq %lu/%u kHz freq scale %lu\n",
-		 cpumask_pr_args(policy->cpus), cur, policy->max, scale);
-
-	for_each_cpu(cpu, policy->cpus)
-		per_cpu(freq_scale, cpu) = scale;
-
-	if (freqs)
-		return;
-
-	scale = (policy->max << SCHED_CAPACITY_SHIFT) / cpuinfo->max_freq;
-
-	pr_debug("cpus %*pbl cur max/max freq %u/%u kHz max freq scale %lu\n",
-		 cpumask_pr_args(policy->cpus), policy->max, cpuinfo->max_freq,
-		 scale);
-
-	for_each_cpu(cpu, policy->cpus)
-		per_cpu(max_freq_scale, cpu) = scale;
-}
-
-unsigned long cpufreq_scale_freq_capacity(struct sched_domain *sd, int cpu)
-{
-	return per_cpu(freq_scale, cpu);
-}
-
-unsigned long cpufreq_scale_max_freq_capacity(int cpu)
-{
-	return per_cpu(max_freq_scale, cpu);
-}
+void __weak arch_scale_set_max_freq(int cpu, unsigned long freq) {}
 
 static void __cpufreq_notify_transition(struct cpufreq_policy *policy,
 		struct cpufreq_freqs *freqs, unsigned int state)
 {
+	struct cpumask cpus;
+	int cpu;
+
 	BUG_ON(irqs_disabled());
 
 	if (cpufreq_disabled())
@@ -368,6 +332,11 @@ static void __cpufreq_notify_transition(struct cpufreq_policy *policy,
 		pr_debug("FREQ: %lu - CPU: %lu\n",
 			 (unsigned long)freqs->new, (unsigned long)freqs->cpu);
 		trace_cpu_frequency(freqs->new, freqs->cpu);
+
+		arch_get_cluster_cpus(&cpus, arch_get_cluster_id(freqs->cpu));
+		for_each_cpu(cpu, &cpus)
+			arch_scale_set_curr_freq(cpu, freqs->new);
+
 		srcu_notifier_call_chain(&cpufreq_transition_notifier_list,
 				CPUFREQ_POSTCHANGE, freqs);
 		if (likely(policy) && likely(policy->cpu == freqs->cpu))
@@ -407,9 +376,6 @@ static void cpufreq_notify_post_transition(struct cpufreq_policy *policy,
 void cpufreq_freq_transition_begin(struct cpufreq_policy *policy,
 		struct cpufreq_freqs *freqs)
 {
-#ifdef CONFIG_SMP
-	int cpu;
-#endif
 
 	/*
 	 * Catch double invocations of _begin() which lead to self-deadlock.
@@ -436,12 +402,6 @@ wait:
 	policy->transition_task = current;
 
 	spin_unlock(&policy->transition_lock);
-
-	scale_freq_capacity(policy, freqs);
-#ifdef CONFIG_SMP
-	for_each_cpu(cpu, policy->cpus)
-		trace_cpu_capacity(capacity_curr_of(cpu), cpu);
-#endif
 
 	cpufreq_notify_transition(policy, freqs, CPUFREQ_PRECHANGE);
 }
@@ -1178,6 +1138,13 @@ static int update_policy_cpu(struct cpufreq_policy *policy, unsigned int cpu,
 	return 0;
 }
 
+static void aee_record_cpufreq_cb_wrap(unsigned int step)
+{
+#ifdef CONFIG_ARCH_MT6797
+	aee_record_cpufreq_cb(step);
+#endif
+}
+
 static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 {
 	unsigned int j, cpu = dev->id;
@@ -1209,7 +1176,9 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 
 #ifdef CONFIG_HOTPLUG_CPU
 	/* Check if this cpu was hot-unplugged earlier and has siblings */
+	aee_record_cpufreq_cb_wrap(3);
 	read_lock_irqsave(&cpufreq_driver_lock, flags);
+	aee_record_cpufreq_cb_wrap(4);
 	list_for_each_entry(tpolicy, &cpufreq_policy_list, policy_list) {
 		if (cpumask_test_cpu(cpu, tpolicy->related_cpus)) {
 			read_unlock_irqrestore(&cpufreq_driver_lock, flags);
@@ -1219,6 +1188,7 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 		}
 	}
 	read_unlock_irqrestore(&cpufreq_driver_lock, flags);
+	aee_record_cpufreq_cb_wrap(5);
 #endif
 
 	/*
@@ -1252,6 +1222,7 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	/* call driver. From then on the cpufreq must be able
 	 * to accept all calls to ->verify and ->setpolicy for this CPU
 	 */
+	aee_record_cpufreq_cb_wrap(6);
 	ret = cpufreq_driver->init(policy);
 	if (ret) {
 		pr_debug("initialization failed\n");
@@ -1274,6 +1245,7 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 
 	down_write(&policy->rwsem);
 	write_lock_irqsave(&cpufreq_driver_lock, flags);
+	aee_record_cpufreq_cb_wrap(12);
 	for_each_cpu(j, policy->cpus)
 		per_cpu(cpufreq_cpu_data, j) = policy;
 	write_unlock_irqrestore(&cpufreq_driver_lock, flags);
@@ -1329,6 +1301,7 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
 				     CPUFREQ_START, policy);
 
+	aee_record_cpufreq_cb_wrap(13);
 	if (!recover_policy) {
 		ret = cpufreq_add_dev_interface(policy, dev);
 		if (ret)
@@ -1337,10 +1310,12 @@ static int __cpufreq_add_dev(struct device *dev, struct subsys_interface *sif)
 				CPUFREQ_CREATE_POLICY, policy);
 	}
 
+	aee_record_cpufreq_cb_wrap(14);
 	write_lock_irqsave(&cpufreq_driver_lock, flags);
 	list_add(&policy->policy_list, &cpufreq_policy_list);
 	write_unlock_irqrestore(&cpufreq_driver_lock, flags);
 
+	aee_record_cpufreq_cb_wrap(15);
 	cpufreq_init_policy(policy);
 
 	if (!recover_policy) {
@@ -1727,6 +1702,7 @@ EXPORT_SYMBOL(cpufreq_generic_suspend);
  */
 void cpufreq_suspend(void)
 {
+#if 0
 	struct cpufreq_policy *policy;
 
 	if (!cpufreq_driver)
@@ -1749,6 +1725,10 @@ void cpufreq_suspend(void)
 
 suspend:
 	cpufreq_suspended = true;
+#else
+	/* Avoid hotplug racing issue */
+	return;
+#endif
 }
 
 /**
@@ -1759,6 +1739,7 @@ suspend:
  */
 void cpufreq_resume(void)
 {
+#if 0
 	struct cpufreq_policy *policy;
 
 	if (!cpufreq_driver)
@@ -1791,6 +1772,10 @@ void cpufreq_resume(void)
 		return;
 
 	schedule_work(&policy->update);
+#else
+	/* Avoid hotplug racing issue */
+	return;
+#endif
 }
 
 /**
@@ -2230,7 +2215,7 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 				struct cpufreq_policy *new_policy)
 {
 	struct cpufreq_governor *old_gov;
-	int ret;
+	int ret, cpu;
 
 	pr_debug("setting new policy for CPU %u: %u - %u kHz\n",
 		 new_policy->cpu, new_policy->min, new_policy->max);
@@ -2265,11 +2250,12 @@ static int cpufreq_set_policy(struct cpufreq_policy *policy,
 	blocking_notifier_call_chain(&cpufreq_policy_notifier_list,
 			CPUFREQ_NOTIFY, new_policy);
 
-	scale_freq_capacity(new_policy, NULL);
-
 	policy->min = new_policy->min;
 	policy->max = new_policy->max;
 	trace_cpu_frequency_limits(policy->max, policy->min, policy->cpu);
+
+	for_each_cpu(cpu, policy->cpus)
+		arch_scale_set_max_freq(cpu, policy->max);
 
 	pr_debug("new min and max freqs are %u - %u kHz\n",
 		 policy->min, policy->max);
@@ -2377,6 +2363,51 @@ unlock:
 }
 EXPORT_SYMBOL(cpufreq_update_policy);
 
+static void setup_cpu0_symlink(struct device *dev, bool is_remove)
+{
+	static unsigned int root_cpu;
+
+	/* remove cpu0 symlink */
+	if (is_remove) {
+		if (dev->id == 0) {
+			sysfs_remove_link(&dev->kobj, "cpufreq");
+			root_cpu = 0;
+			pr_debug("%s()#%d: remove cpu0 symlink\n", __func__, __LINE__);
+		}
+	/* create or modify cpu0 symlink */
+	} else {
+		if (dev->id == root_cpu) {
+			struct device *cpu0_dev;
+			struct cpufreq_policy *policy;
+			unsigned int next_root_cpu;
+			int ret = -1;
+
+			cpu0_dev = get_cpu_device(0);
+
+			for_each_online_cpu(next_root_cpu) {
+				if (next_root_cpu == root_cpu)
+					continue;
+				else
+					break;
+			}
+
+			policy = cpufreq_cpu_get(next_root_cpu);
+
+			if (policy) {
+				if (root_cpu != 0)
+					sysfs_remove_link(&cpu0_dev->kobj, "cpufreq");
+				ret = sysfs_create_link(&cpu0_dev->kobj, &policy->kobj, "cpufreq");
+				if (!ret) {
+					pr_debug("%s()#%d: create/modify cpu0 symlink (from root_cpu = %d to next_root_cpu = %d)\n",
+						 __func__, __LINE__, root_cpu, next_root_cpu);
+					root_cpu = next_root_cpu;
+				}
+				cpufreq_cpu_put(policy);
+			}
+		}
+	}
+}
+
 static int cpufreq_cpu_callback(struct notifier_block *nfb,
 					unsigned long action, void *hcpu)
 {
@@ -2387,7 +2418,11 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 	if (dev) {
 		switch (action & ~CPU_TASKS_FROZEN) {
 		case CPU_ONLINE:
+			aee_record_cpufreq_cb_wrap(1);
+			setup_cpu0_symlink(dev, true); /* remove cpu0 symlink */
+			aee_record_cpufreq_cb_wrap(2);
 			__cpufreq_add_dev(dev, NULL);
+			aee_record_cpufreq_cb_wrap(0);
 			break;
 
 		case CPU_DOWN_PREPARE:
@@ -2395,10 +2430,14 @@ static int cpufreq_cpu_callback(struct notifier_block *nfb,
 			break;
 
 		case CPU_POST_DEAD:
+			if (dev->id != 0)
+				setup_cpu0_symlink(dev, false); /* modify cpu0 symlink */
 			__cpufreq_remove_dev_finish(dev, NULL);
+			setup_cpu0_symlink(dev, false); /* create cpu0 symlink */
 			break;
 
 		case CPU_DOWN_FAILED:
+			setup_cpu0_symlink(dev, true); /* remove cpu0 symlink */
 			__cpufreq_add_dev(dev, NULL);
 			break;
 		}

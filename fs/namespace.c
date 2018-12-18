@@ -728,7 +728,12 @@ static struct mountpoint *new_mountpoint(struct dentry *dentry)
 	struct mountpoint *mp;
 	int ret;
 
-	mp = kmalloc(sizeof(struct mountpoint), GFP_KERNEL);
+	/*
+	 * We are allocating as GFP_NOFS to appease lockdep:
+	 * since we are holding i_mutex we should not try to
+	 * recurse into filesystem code.
+	 */
+	mp = kmalloc(sizeof(struct mountpoint), GFP_NOFS);
 	if (!mp)
 		return ERR_PTR(-ENOMEM);
 
@@ -1082,6 +1087,7 @@ static void mntput_no_expire(struct mount *mnt)
 		unlock_mount_hash();
 		return;
 	}
+
 	mnt->mnt.mnt_flags |= MNT_DOOMED;
 	rcu_read_unlock();
 

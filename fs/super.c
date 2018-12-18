@@ -790,8 +790,8 @@ static void do_emergency_remount(struct work_struct *work)
 		sb->s_count++;
 		spin_unlock(&sb_lock);
 		down_write(&sb->s_umount);
-		if (sb->s_root && sb->s_bdev && (sb->s_flags & MS_BORN) &&
-		    !(sb->s_flags & MS_RDONLY)) {
+		if (sb->s_root && (sb->s_bdev || !(strcmp(sb->s_type->name, "ubifs"))) &&
+		    (sb->s_flags & MS_BORN) && !(sb->s_flags & MS_RDONLY)) {
 			/*
 			 * What lock protects sb->s_flags??
 			 */
@@ -1171,7 +1171,13 @@ void __sb_end_write(struct super_block *sb, int level)
 	smp_mb();
 	if (waitqueue_active(&sb->s_writers.wait))
 		wake_up(&sb->s_writers.wait);
+
+	/*s_writers was taken with lockdep checks disabled,
+	* so turn off lockdep checks here too
+	*/
+	lockdep_off();
 	rwsem_release(&sb->s_writers.lock_map[level-1], 1, _RET_IP_);
+	lockdep_on();
 }
 EXPORT_SYMBOL(__sb_end_write);
 
@@ -1197,7 +1203,13 @@ static void acquire_freeze_lock(struct super_block *sb, int level, bool trylock,
 				break;
 			}
 	}
+
+	/*s_writers was taken with lockdep checks disabled,
+	* so turn off lockdep checks here too
+	*/
+	lockdep_off();
 	rwsem_acquire_read(&sb->s_writers.lock_map[level-1], 0, trylock, ip);
+	lockdep_on();
 }
 #endif
 

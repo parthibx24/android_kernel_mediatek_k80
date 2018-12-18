@@ -1046,6 +1046,14 @@ free_card:
 }
 
 /*
+ * SD card power cycle, if SD use MMC_CAP_HW_RESET, please remove this function
+ */
+int mmc_sd_power_cycle(struct mmc_host *host, u32 ocr, struct mmc_card *card)
+{
+	return mmc_sd_init_card(host, ocr, card);
+}
+
+/*
  * Host is being removed. Free up the current card.
  */
 static void mmc_sd_remove(struct mmc_host *host)
@@ -1251,15 +1259,10 @@ static int mmc_sd_runtime_resume(struct mmc_host *host)
 	return 0;
 }
 
-static int mmc_sd_power_restore(struct mmc_host *host)
+static int mmc_sd_reset(struct mmc_host *host)
 {
-	int ret;
-
-	mmc_claim_host(host);
-	ret = mmc_sd_init_card(host, host->card->ocr, host->card);
-	mmc_release_host(host);
-
-	return ret;
+	mmc_power_cycle(host, host->card->ocr);
+	return mmc_sd_init_card(host, host->card->ocr, host->card);
 }
 
 static const struct mmc_bus_ops mmc_sd_ops = {
@@ -1269,9 +1272,9 @@ static const struct mmc_bus_ops mmc_sd_ops = {
 	.runtime_resume = mmc_sd_runtime_resume,
 	.suspend = mmc_sd_suspend,
 	.resume = mmc_sd_resume,
-	.power_restore = mmc_sd_power_restore,
 	.alive = mmc_sd_alive,
 	.shutdown = mmc_sd_suspend,
+	.reset = mmc_sd_reset,
 };
 
 /*

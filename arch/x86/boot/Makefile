@@ -9,9 +9,6 @@
 # Changed by many, many contributors over the years.
 #
 
-KASAN_SANITIZE			:= n
-OBJECT_FILES_NON_STANDARD	:= y
-
 # Kernel does not boot with kcov instrumentation here.
 # One of the problems observed was insertion of __sanitizer_cov_trace_pc()
 # callback into middle of per-cpu data enabling code. Thus the callback observed

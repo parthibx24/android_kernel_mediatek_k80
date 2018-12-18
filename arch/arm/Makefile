@@ -183,6 +183,10 @@ machine-$(CONFIG_ARCH_MV78XX0)		+= mv78xx0
 machine-$(CONFIG_ARCH_MVEBU)		+= mvebu
 machine-$(CONFIG_ARCH_MXC)		+= imx
 machine-$(CONFIG_ARCH_MEDIATEK)		+= mediatek
+# only for 32-bit bringup, must refactor this later
+ifneq ($(CONFIG_ARCH_MEDIATEK),y)
+machine-$(CONFIG_MEDIATEK_SOLUTION)	+= mediatek
+endif
 machine-$(CONFIG_ARCH_MXS)		+= mxs
 machine-$(CONFIG_ARCH_NETX)		+= netx
 machine-$(CONFIG_ARCH_NOMADIK)		+= nomadik
@@ -300,7 +304,17 @@ endif
 
 all:	$(KBUILD_IMAGE) $(KBUILD_DTBS)
 
+MTK_PLATFORM := $(CONFIG_MTK_PLATFORM:"%"=%)
+MTK_PROJECT := $(CONFIG_ARCH_MTK_PROJECT:"%"=%)
+export MTK_PLATFORM MTK_PROJECT MTK_TARGET_PROJECT
+KBUILD_CPPFLAGS += -I$(srctree)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include
+KBUILD_CPPFLAGS += -I$(srctree)/arch/arm/mach-mediatek/include/
+-include $(srctree)/scripts/drvgen/drvgen.mk
+archprepare: $(DRVGEN_FILE_LIST)
+dtbs: $(DRVGEN_FILE_LIST)
+
 boot := arch/arm/boot
+
 
 archprepare:
 	$(Q)$(MAKE) $(build)=arch/arm/tools include/generated/mach-types.h
@@ -326,7 +340,7 @@ PHONY += dtbs dtbs_install
 dtbs dtbs_install: prepare scripts
 	$(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE) $@
 
-zImage-dtb: vmlinux scripts dtbs
+zImage-dtb: vmlinux scripts dtbs $(DTB_OVERLAY_IMAGE_TAGERT)
 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/$@
 
 PHONY += vdso_install

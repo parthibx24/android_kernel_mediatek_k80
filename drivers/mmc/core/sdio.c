@@ -576,6 +576,7 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 	    ((card->host->ios.timing == MMC_TIMING_UHS_SDR50) ||
 	      (card->host->ios.timing == MMC_TIMING_UHS_SDR104)))
 		err = mmc_execute_tuning(card);
+
 out:
 	return err;
 }
@@ -959,8 +960,12 @@ static int mmc_sdio_suspend(struct mmc_host *host)
 		mmc_release_host(host);
 	}
 
-	if (!mmc_card_keep_power(host))
+	if (!mmc_card_keep_power(host)) {
 		mmc_power_off(host);
+	} else if (host->retune_period) {
+		mmc_retune_timer_stop(host);
+		mmc_retune_needed(host);
+	}
 
 	return 0;
 }

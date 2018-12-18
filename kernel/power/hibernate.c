@@ -648,6 +648,8 @@ int hibernate(void)
 {
 	int error, nr_calls = 0;
 
+	hib_log("entering hibernate()\n");
+
 	if (!hibernation_available()) {
 		pr_debug("PM: Hibernation not available.\n");
 		return -EPERM;
@@ -871,7 +873,10 @@ static int software_resume(void)
 	goto Finish;
 }
 
-late_initcall_sync(software_resume);
+#if !defined(CONFIG_MTK_HIBERNATION)
+/* IPO-H, move to kernel_init() @ kernel/init/main.c */
+late_initcall(software_resume);
+#endif
 
 
 static const char * const hibernation_modes[] = {
