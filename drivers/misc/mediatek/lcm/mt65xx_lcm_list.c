@@ -34,6 +34,11 @@ LCM_DSI_MODE_CON lcm_dsi_mode;
 #endif
 
 LCM_DRIVER *lcm_driver_list[] = {
+
+#if defined(HX8394D_BLD_CMI)
+    &hx8394d_bld_cmi_lcm_drv,
+#endif
+
 #if defined(ILI9881C_HD_DSI_VDO_ILITEK_NT50358_3LANE)
 	&ili9881c_hd_dsi_vdo_ilitek_nt50358_3lane_lcm_drv,
 #endif
