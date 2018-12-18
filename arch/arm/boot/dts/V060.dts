@@ -5,10 +5,10 @@
 /plugin/;
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include <dt-bindings/interrupt-controller/irq.h>
-#include "mt6580-pinfunc.h"
+#include "V060/mt6580-pinfunc.h"
 #include <dt-bindings/mmc/mt6580-msdc.h>
 #else
-#include "mt6580.dts"
+#include "V060/mt6580.dts"
 #endif
 
 /* chosen */
@@ -712,5 +712,5 @@
 };
 /* CONSYS end */
 
-#include <k80_bsp/cust.dtsi>
+#include <V060/cust.dtsi>
 /*End of this file, DO NOT ADD ANYTHING HERE*/
