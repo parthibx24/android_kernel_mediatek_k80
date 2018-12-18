@@ -26,11 +26,11 @@
 &i2c1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
-	cap_touch_mtk:cap_touch@5d {
+	cap_touch_mtk:cap_touch@38 {
 		compatible = "mediatek,cap_touch";
-		reg = <0x5d>;
-		status = "okay";
-	};
+		reg = <0x38>;
+        status = "okay";
+    };
 	ext_buck_mtk:ext_buck@60 {
 		compatible = "mediatek,ext_buck";
 		reg = <0x60>;
