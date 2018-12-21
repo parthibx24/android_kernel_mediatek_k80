@@ -292,22 +292,13 @@
 	mediatek,kpd-use-extend-type = <0>;
 	/*HW Keycode [0~71] -> Linux Keycode*/
 	mediatek,kpd-hw-map-num = <72>;
-	mediatek,kpd-hw-init-map = <115 0 0 0 0 0 0 0 0 114 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 0 
-				0 0 0 0 0 0 0 0 >;
+	mediatek,kpd-hw-init-map = <114 108 103 0 0 0 0 0 0 115 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0>;
 	mediatek,kpd-pwrkey-eint-gpio = <0>;
 	mediatek,kpd-pwkey-gpio-din  = <0>;
-	mediatek,kpd-hw-dl-key0 = <0>;
-	mediatek,kpd-hw-dl-key1 = <9>;
+	mediatek,kpd-hw-dl-key0 = <9>;
+	mediatek,kpd-hw-dl-key1 = <0>;
 	mediatek,kpd-hw-dl-key2 = <8>;
-	mediatek,kpd-hw-recovery-key = <0>;
-	mediatek,kpd-hw-factory-key = <9>;
+	mediatek,kpd-hw-recovery-key = <9>;
+	mediatek,kpd-hw-factory-key = <0>;
 	status = "okay";
 };
-
-
