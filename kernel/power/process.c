@@ -154,6 +154,10 @@ int freeze_processes(void)
 	int error;
 	int oom_kills_saved;
 
+	// don't freeze and error
+	if(true)
+		return 1;
+
 	error = __usermodehelper_disable(UMH_FREEZING);
 	if (error)
 		return error;
