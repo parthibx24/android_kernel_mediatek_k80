@@ -69,11 +69,6 @@
 #include <linux/of_gpio.h>
 #include <linux/of_irq.h>
 
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-#include <mach/md32_ipi.h>
-#include <mach/md32_helper.h>
-#endif
-
 #ifdef FTS_MCAP_TEST
 #include "mcap_test_lib.h"
 #endif
@@ -116,49 +111,6 @@ int apk_debug_flag = 0;
 //static unsigned long esd_check_circle = TPD_ESD_CHECK_CIRCLE;
 //static u8 run_check_91_register;
 //modify@zte.com.cn 20160624 end
-#endif
-
-
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-enum DOZE_T {
-	DOZE_DISABLED = 0,
-	DOZE_ENABLED = 1,
-	DOZE_WAKEUP = 2,
-};
-static DOZE_T doze_status = DOZE_DISABLED;
-#endif
-
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-static s8 ftp_enter_doze(struct i2c_client *client);
-
-enum TOUCH_IPI_CMD_T {
-	/* SCP->AP */
-	IPI_COMMAND_SA_GESTURE_TYPE,
-	/* AP->SCP */
-	IPI_COMMAND_AS_CUST_PARAMETER,
-	IPI_COMMAND_AS_ENTER_DOZEMODE,
-	IPI_COMMAND_AS_ENABLE_GESTURE,
-	IPI_COMMAND_AS_GESTURE_SWITCH,
-};
-
-struct Touch_Cust_Setting {
-	u32 i2c_num;
-	u32 int_num;
-	u32 io_int;
-	u32 io_rst;
-};
-
-struct Touch_IPI_Packet {
-	u32 cmd;
-	union {
-		u32 data;
-		Touch_Cust_Setting tcs;
-	} param;
-};
-
-/* static bool tpd_scp_doze_en = FALSE; */
-static bool tpd_scp_doze_en = TRUE;
-DEFINE_MUTEX(i2c_access);
 #endif
 
 #define TPD_SUPPORT_POINTS	5
@@ -451,74 +403,8 @@ static int of_get_ft5x0x_platform_data(struct device *dev)
 	return 0;
 }
 
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-static ssize_t show_scp_ctrl(struct device *dev, struct device_attribute *attr, char *buf)
-{
-	return 0;
-}
-static ssize_t store_scp_ctrl(struct device *dev, struct device_attribute *attr, const char *buf, size_t size)
-{
-	u32 cmd;
-	Touch_IPI_Packet ipi_pkt;
-
-	if (kstrtoul(buf, 10, &cmd)) {
-		TPD_DEBUG("[SCP_CTRL]: Invalid values\n");
-		return -EINVAL;
-	}
-
-	TPD_DEBUG("SCP_CTRL: Command=%d", cmd);
-	switch (cmd) {
-	case 1:
-	    /* make touch in doze mode */
-	    tpd_scp_wakeup_enable(TRUE);
-	    tpd_suspend(NULL);
-	    break;
-	case 2:
-	    tpd_resume(NULL);
-	    break;
-		/*case 3:
-	    // emulate in-pocket on
-	    ipi_pkt.cmd = IPI_COMMAND_AS_GESTURE_SWITCH,
-	    ipi_pkt.param.data = 1;
-		md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 0);
-	    break;
-	case 4:
-	    // emulate in-pocket off
-	    ipi_pkt.cmd = IPI_COMMAND_AS_GESTURE_SWITCH,
-	    ipi_pkt.param.data = 0;
-		md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 0);
-	    break;*/
-	case 5:
-		{
-				Touch_IPI_Packet ipi_pkt;
-
-				ipi_pkt.cmd = IPI_COMMAND_AS_CUST_PARAMETER;
-			    ipi_pkt.param.tcs.i2c_num = TPD_I2C_NUMBER;
-			ipi_pkt.param.tcs.int_num = CUST_EINT_TOUCH_PANEL_NUM;
-				ipi_pkt.param.tcs.io_int = tpd_int_gpio_number;
-			ipi_pkt.param.tcs.io_rst = tpd_rst_gpio_number;
-			if (md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 0) < 0)
-				TPD_DEBUG("[TOUCH] IPI cmd failed (%d)\n", ipi_pkt.cmd);
-
-			break;
-		}
-	default:
-	    TPD_DEBUG("[SCP_CTRL] Unknown command");
-	    break;
-	}
-
-	return size;
-}
-static DEVICE_ATTR(tpd_scp_ctrl, 0664, show_scp_ctrl, store_scp_ctrl);
-#endif
-
 static struct device_attribute *ft5x0x_attrs[] = {
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-	&dev_attr_tpd_scp_ctrl,
-#endif
 };
-
-
 
 #ifdef USB_CHARGE_DETECT
 void tpd_usb_plugin(u8 plugin)
@@ -1350,14 +1236,6 @@ reset_proc:
 //	queue_delayed_work(gtp_esd_check_workqueue, &gtp_esd_check_work, TPD_ESD_CHECK_CIRCLE);
 #endif
 
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-	int ret;
-
-	ret = get_md32_semaphore(SEMAPHORE_TOUCH);
-	if (ret < 0)
-		pr_err("[TOUCH] HW semaphore reqiure timeout\n");
-#endif
-
 #ifdef USB_CHARGE_DETECT  //add by wangyang
 		if(ctp_is_probe == 0)
 		{
@@ -1729,44 +1607,6 @@ static int tpd_local_init(void)
 	return 0;
 }
 
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-static s8 ftp_enter_doze(struct i2c_client *client)
-{
-	s8 ret = -1;
-	s8 retry = 0;
-	char gestrue_on = 0x01;
-	char gestrue_data;
-	int i;
-
-	/* TPD_DEBUG("Entering doze mode..."); */
-	pr_alert("Entering doze mode...");
-
-	/* Enter gestrue recognition mode */
-	ret = fts_write_reg(i2c_client, FT_GESTRUE_MODE_SWITCH_REG, gestrue_on);
-	if (ret < 0) {
-		/* TPD_DEBUG("Failed to enter Doze %d", retry); */
-		pr_alert("Failed to enter Doze %d", retry);
-		return ret;
-	}
-	msleep(30);
-
-	for (i = 0; i < 10; i++) {
-		fts_read_reg(i2c_client, FT_GESTRUE_MODE_SWITCH_REG, &gestrue_data);
-		if (gestrue_data == 0x01) {
-			doze_status = DOZE_ENABLED;
-			/* TPD_DEBUG("FTP has been working in doze mode!"); */
-			pr_alert("FTP has been working in doze mode!");
-			break;
-		}
-		msleep(20);
-		fts_write_reg(i2c_client, FT_GESTRUE_MODE_SWITCH_REG, gestrue_on);
-
-	}
-
-	return ret;
-}
-#endif
-
 static void tpd_resume(struct device *h)
 {
 //wwm start//
@@ -1830,33 +1670,9 @@ static void tpd_resume(struct device *h)
 #endif			//wwm add//
 
 	tpd_halt = 0;
-			
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-	int ret;
 
-	if (tpd_scp_doze_en) {
-		ret = get_md32_semaphore(SEMAPHORE_TOUCH);
-		if (ret < 0) {
-			TPD_DEBUG("[TOUCH] HW semaphore reqiure timeout\n");
-		} else {
-			Touch_IPI_Packet ipi_pkt = {.cmd = IPI_COMMAND_AS_ENABLE_GESTURE, .param.data = 0};
-
-			md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 0);
-		}
-	}
-#endif
-
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-	doze_status = DOZE_DISABLED;
-	/* tpd_halt = 0; */
-	int data;
-
-	data = 0x00;
-
-	fts_write_reg(i2c_client, FT_GESTRUE_MODE_SWITCH_REG, data);
-#else
 	enable_irq(touch_irq);
-#endif
+
 //modify@zte.com.cn 20160624 begin
 #if FT_ESD_PROTECT
    fts_esd_protection_resume();
@@ -1886,18 +1702,6 @@ static void tpd_resume(struct device *h)
 //modify@zte.com.cn at 20160617 end	
 
 }
-
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-void tpd_scp_wakeup_enable(bool en)
-{
-	tpd_scp_doze_en = en;
-}
-
-void tpd_enter_doze(void)
-{
-
-}
-#endif
 
 static void tpd_suspend(struct device *h)
 {
@@ -1972,79 +1776,6 @@ static void tpd_suspend(struct device *h)
 	}
 	#endif
 
-#ifdef CONFIG_MTK_SENSOR_HUB_SUPPORT
-	int sem_ret;
-
-	tpd_enter_doze();
-
-	int ret;
-	char gestrue_data;
-	char gestrue_cmd = 0x03;
-	static int scp_init_flag;
-
-	/* TPD_DEBUG("[tpd_scp_doze]:init=%d en=%d", scp_init_flag, tpd_scp_doze_en); */
-
-	mutex_lock(&i2c_access);
-
-	sem_ret = release_md32_semaphore(SEMAPHORE_TOUCH);
-
-	if (scp_init_flag == 0) {
-		Touch_IPI_Packet ipi_pkt;
-
-		ipi_pkt.cmd = IPI_COMMAND_AS_CUST_PARAMETER;
-		ipi_pkt.param.tcs.i2c_num = TPD_I2C_NUMBER;
-		ipi_pkt.param.tcs.int_num = CUST_EINT_TOUCH_PANEL_NUM;
-		ipi_pkt.param.tcs.io_int = tpd_int_gpio_number;
-		ipi_pkt.param.tcs.io_rst = tpd_rst_gpio_number;
-
-		TPD_DEBUG("[TOUCH]SEND CUST command :%d ", IPI_COMMAND_AS_CUST_PARAMETER);
-
-		ret = md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 0);
-		if (ret < 0)
-			TPD_DEBUG(" IPI cmd failed (%d)\n", ipi_pkt.cmd);
-
-		msleep(20); /* delay added between continuous command */
-		/* Workaround if suffer MD32 reset */
-		/* scp_init_flag = 1; */
-	}
-
-	if (tpd_scp_doze_en) {
-		TPD_DEBUG("[TOUCH]SEND ENABLE GES command :%d ", IPI_COMMAND_AS_ENABLE_GESTURE);
-		ret = ftp_enter_doze(i2c_client);
-		if (ret < 0) {
-			TPD_DEBUG("FTP Enter Doze mode failed\n");
-	  } else {
-			int retry = 5;
-	    {
-				/* check doze mode */
-				fts_read_reg(i2c_client, FT_GESTRUE_MODE_SWITCH_REG, &gestrue_data);
-				TPD_DEBUG("========================>0x%x", gestrue_data);
-	    }
-
-	    msleep(20);
-			Touch_IPI_Packet ipi_pkt = {.cmd = IPI_COMMAND_AS_ENABLE_GESTURE, .param.data = 1};
-
-			do {
-				if (md32_ipi_send(IPI_TOUCH, &ipi_pkt, sizeof(ipi_pkt), 1) == DONE)
-					break;
-				msleep(20);
-				TPD_DEBUG("==>retry=%d", retry);
-			} while (retry--);
-
-	    if (retry <= 0)
-				TPD_DEBUG("############# md32_ipi_send failed retry=%d", retry);
-
-			/*while(release_md32_semaphore(SEMAPHORE_TOUCH) <= 0) {
-				//TPD_DEBUG("GTP release md32 sem failed\n");
-				pr_alert("GTP release md32 sem failed\n");
-			}*/
-
-		}
-		/* disable_irq(touch_irq); */
-	}
-
-	mutex_unlock(&i2c_access);
-#else
 	disable_irq(touch_irq);
 	fts_write_reg(i2c_client, 0xA5, data);  /* TP enter sleep mode */
 //modify@zte.com.cn 20160624 begin
@@ -2060,8 +1791,6 @@ static void tpd_suspend(struct device *h)
 		TPD_DMESG("Failed to disable reg-vgp6: %d\n", retval);
 #endif
 //wwm end//
-
-#endif
 
 }
 
