@@ -373,33 +373,6 @@ static struct i2c_driver tpd_i2c_driver = {
 	.detect = tpd_i2c_detect,
 };
 
-static int of_get_ft5x0x_platform_data(struct device *dev)
-{
-	/*int ret, num;*/
-
-	if (dev->of_node) {
-		const struct of_device_id *match;
-
-		match = of_match_device(of_match_ptr(ft5x0x_dt_match), dev);
-		if (!match) {
-			TPD_DMESG("Error: No device match found\n");
-			return -ENODEV;
-		}
-	}
-//	tpd_rst_gpio_number = of_get_named_gpio(dev->of_node, "rst-gpio", 0);
-//	tpd_int_gpio_number = of_get_named_gpio(dev->of_node, "int-gpio", 0);
-	/*ret = of_property_read_u32(dev->of_node, "rst-gpio", &num);
-	if (!ret)
-		tpd_rst_gpio_number = num;
-	ret = of_property_read_u32(dev->of_node, "int-gpio", &num);
-	if (!ret)
-		tpd_int_gpio_number = num;
-  */
-	TPD_DMESG("g_vproc_en_gpio_number %d\n", tpd_rst_gpio_number);
-	TPD_DMESG("g_vproc_vsel_gpio_number %d\n", tpd_int_gpio_number);
-	return 0;
-}
-
 static struct device_attribute *ft5x0x_attrs[] = {
 };
 
@@ -1032,9 +1005,6 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		TPD_DMESG("[FTS][CRITICAL]: Changing I2C address to 0x%02x\n", FTS_I2C_ADDRESS);
 		i2c_client->addr = FTS_I2C_ADDRESS;
 	}
-
-	of_get_ft5x0x_platform_data(&client->dev);
-	/* configure the gpio pins */
 
 	TPD_DMESG("mtk_tpd: tpd_probe ft5x0x\n");
 
