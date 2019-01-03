@@ -47,6 +47,7 @@
 //#define CONFIG_FT_AUTO_UPGRADE_SUPPORT  /*move to defconfig file*/
 /*#define FT5X36_UPGADE*//*donot use it*/
 /*#define FTS_AUTO_UPGRADE*//*donot use it*/
+#define FTS_I2C_ADDRESS 0x38
 #define TPD_DELAY		(2*HZ/100)
 /*#define CONFIG_CUST_FTS_APK_DEBUG*//*move to defconfig file*/
 

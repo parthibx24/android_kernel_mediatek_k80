@@ -1019,10 +1019,18 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	g_focalclient = client;
 	#endif 
 	fts_input_dev=tpd->dev;
-	printk("wwm:i2c_client->addr=0x%02x\n", i2c_client->addr);
-	if(i2c_client->addr != 0x38)
-	{
-		i2c_client->addr = 0x38;
+
+	/* I2C address check */
+	TPD_DMESG("[FTS] I2C client address (i2c_client->addr) is 0x%02x\n", i2c_client->addr);
+
+	if(i2c_client->addr != FTS_I2C_ADDRESS)
+		TPD_DMESG("[FTS][CRITICAL]: Unknown tpd I2C client address. Please change I2C address to 0x%02x in device tree.", 
+			FTS_I2C_ADDRESS);
+
+	// Force change I2C address to FTS_I2C_ADDRESS
+	if(false) { // disabled
+		TPD_DMESG("[FTS][CRITICAL]: Changing I2C address to 0x%02x\n", FTS_I2C_ADDRESS);
+		i2c_client->addr = FTS_I2C_ADDRESS;
 	}
 
 	of_get_ft5x0x_platform_data(&client->dev);
