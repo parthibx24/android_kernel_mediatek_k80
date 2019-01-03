@@ -199,9 +199,6 @@ static unsigned int touch_irq = 0;
 #define TOUCH3_YH	0x11
 #define TOUCH3_YL	0x12
 
-#define TPD_RESET_ISSUE_WORKAROUND
-#define TPD_MAX_RESET_COUNT	3
-
 #ifdef FTS_MCAP_TEST
 struct i2c_client *g_focalclient = NULL;
 extern int focal_i2c_Read(unsigned char *writebuf, int writelen, unsigned char *readbuf, int readlen);
@@ -1011,8 +1008,9 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int retval = TPD_OK;
 	//u8 report_rate = 0;
-	int reset_count = 0,InkId;
+	int InkId;
 	char data;
+	int reset_count;
 	int err = 0;
 
 	i2c_client = client;
@@ -1070,25 +1068,42 @@ static int tpd_probe(struct i2c_client *client, const struct i2c_device_id *id)
 		fts_Gesture_init(tpd->dev);
 #endif
 
+	/* Workaround for TPD_RESET_ISSUE
+	 * Try to sync reg 0x00 after 'Reset CTP',
+	 * synced data should be 0 if not than error,
+	 * try to 'Reset CTP' again.
+	 * try limit: TPD_MAX_RESET_COUNT
+	 */
+	for(reset_count = 0; reset_count < TPD_MAX_RESET_COUNT; ++reset_count)
+	{
+		/* Reset CTP */
+		tpd_gpio_output(tpd_rst_gpio_number, 0);
+		msleep(20);
+		tpd_gpio_output(tpd_rst_gpio_number, 1);
+		msleep(400);
 
-reset_proc:
-	/* Reset CTP */
-	tpd_gpio_output(tpd_rst_gpio_number, 0);
-	msleep(20);
-	tpd_gpio_output(tpd_rst_gpio_number, 1);
-	msleep(400);
-	err = fts_read_reg(i2c_client, 0x00, &data);
+		// reg 0x00 data running state is 0; other state is not 0
+		err = fts_read_reg(i2c_client, 0x00, &data);
 
-	TPD_DMESG("fts_i2c:err %d,data:%d\n", err,data);
-	if(err< 0 || data!=0)// reg0 data running state is 0; other state is not 0
+		TPD_DMESG("[FTS]: err %d, data:%d\n", err,data);
+
+		// 'Reset CTP' again if i2c write failed,
+		//	or synced data is not 0.
+		if(err < 0 || data != 0) {
+			TPD_DMESG("[FTS]: Synced data is not 0, Reset CTP again. [%d/%d]",
+			 reset_count, TPD_MAX_RESET_COUNT);
+			continue;
+		}
+		break;
+	}
+
+	/* If fts_read_reg failed or if data is still not 0 than,
+	 * i2c transfer error and tpd is not active.
+	 * return error (-1).
+	 */
+	if(err < 0 || data != 0)
 	{
 		TPD_DMESG("I2C transfer error, line: %d\n", __LINE__);
-#ifdef TPD_RESET_ISSUE_WORKAROUND
-		if ( ++reset_count < TPD_MAX_RESET_COUNT )
-		{
-			goto reset_proc;
-		}
-#endif
 
 //wwm start//
 #if 1
@@ -1112,7 +1127,8 @@ reset_proc:
 		gpio_free(tpd_rst_gpio_number);
 		gpio_free(tpd_int_gpio_number);
 		return -1;
-	}
+	} // err < 0 || data != 0
+
 	tpd_load_status = 1;
 	tpd_irq_registration();
 
