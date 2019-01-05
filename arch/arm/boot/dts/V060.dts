@@ -344,11 +344,11 @@
 	status = "okay";
 };
 &pio {
-	ACCDET_pins_default: eint0default {
+	ACCDET_pins_default: eint1default {
 	};
-	ACCDET_pins_eint_as_int: eint@0 {
+	ACCDET_pins_eint_as_int: eint@1 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO0__FUNC_EINT0>;
+			pins = <PINMUX_GPIO1__FUNC_EINT1>;
 			slew-rate = <0>;
 			bias-disable;
 		};

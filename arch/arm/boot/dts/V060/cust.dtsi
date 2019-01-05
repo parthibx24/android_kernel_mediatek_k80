@@ -79,8 +79,8 @@
 
 &accdet {
 	interrupt-parent = <&eintc>;
-	interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
-	debounce = <0 256000>;
+	interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
+	debounce = <1 0>;
 	status = "okay";
 };
 &gyro {
