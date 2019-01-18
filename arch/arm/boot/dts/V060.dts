@@ -297,7 +297,7 @@
 &pio {
 	alsps_intpin_cfg: alspspincfg {
 	    pins_cmd_dat {
-			pins = <PINMUX_GPIO6__FUNC_EINT6>;
+			pins = <PINMUX_GPIO5__FUNC_EINT5>;
 			slew-rate = <0>;
 			bias-pull-up = <00>;
 		};

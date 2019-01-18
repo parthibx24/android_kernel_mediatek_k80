@@ -109,8 +109,8 @@
 };
 &alsps_mtk {
 	interrupt-parent = <&eintc>;
-	interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
-	debounce = <6 0>;
+	interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
+	debounce = <5 0>;
 	status = "okay";
 };
 &dsi_te {
