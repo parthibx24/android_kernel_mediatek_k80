@@ -980,6 +980,7 @@ ifneq ($(KBUILD_SRC),)
 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
 		echo >&2 "  $(srctree) is not clean, please run 'make mrproper'"; \
 		echo >&2 "  in the '$(srctree)' directory.";\
+		/bin/false; \
 	fi;
 endif
 
