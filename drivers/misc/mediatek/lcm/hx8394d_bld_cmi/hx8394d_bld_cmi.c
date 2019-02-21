@@ -1,5 +1,6 @@
-/*
- * Copyright (C) 2018,
+/**
+ * Version 19.221
+ * Copyright (C) 2019,
  * parthibx24 <e.inxpired@gmail.com>
  *
  * SPDX-License-Identifier: GPL-3.0+
@@ -9,24 +10,23 @@
 
 /* Local Constants */
 #define LCM_NAME "hx8394d_bld_cmi"
+#define LCM_VERSION "19.221" /* YEAR+"."+MONTH+DATE */
 #define LCM_ID (0x83940D)
 #define FRAME_WIDTH  (720)
 #define FRAME_HEIGHT (1280)
-
-#define REGFLAG_DELAY (0xFE)
-#define REGFLAG_END_OF_TABLE (0xFD) /* END OF REGISTERS MARKER */
 
 /* Local Variables */
 #define SET_RESET_PIN(v) (lcm_util.set_reset_pin((v)))
 #define UDELAY(n) (lcm_util.udelay(n))
 #define MDELAY(n) (lcm_util.mdelay(n))
 
-#define LCM_DBG_TAG "[LCM][V060]"
+/* Local Debug Variables */
+#define LCM_DBG_TAG "[LCM]"
+#define LCM_LOGD(str, args...) pr_info(LCM_DBG_TAG "[%s][%s] " str, LCM_NAME, __func__, ##args)
 
 #ifdef BUILD_LK
+#undef LCM_LOGD
 #define LCM_LOGD(str, args...) print(LCM_DBG_TAG "[%s][%s] " str, LCM_NAME, __func__, ##args)
-#else
-#define LCM_LOGD(str, args...) pr_info(LCM_DBG_TAG "[%s][%s] " str, LCM_NAME, __func__, ##args)
 #endif
 
 /* Local Functions */
@@ -47,8 +47,9 @@ static void lcm_set_util_funcs(const LCM_UTIL_FUNCS *util)
     memcpy(&lcm_util, util, sizeof(LCM_UTIL_FUNCS));
 }
 
-static void lcm_get_params(LCM_PARAMS *params) {
-	memset(params, 0, sizeof(LCM_PARAMS));
+static void lcm_get_params(LCM_PARAMS *params)
+{
+    memset(params, 0, sizeof(LCM_PARAMS));
 
     params->type = 2;
 
@@ -206,7 +207,7 @@ static void init_hx8394d_lcm_registers(void)
 
 static void lcm_init(void)
 {
-    LCM_LOGD("!");
+    LCM_LOGD("Starting LCM Initialization!");
 
     SET_RESET_PIN(1);
     MDELAY(10);
@@ -218,8 +219,8 @@ static void lcm_init(void)
     init_hx8394d_lcm_registers();
 }
 
-static unsigned int lcm_compare_id(void) {
-
+static unsigned int lcm_compare_id(void)
+{
     unsigned int data_array[16];
     unsigned int id = 0;
     unsigned char buffer[3];
@@ -267,11 +268,6 @@ static void lcm_suspend(void)
     */
 }
 
-static void lcm_resume(void)
-{
-	lcm_init();
-}
-
 /* Get LCM Driver Hooks */
 LCM_DRIVER hx8394d_bld_cmi_lcm_drv =
 {
@@ -280,6 +276,6 @@ LCM_DRIVER hx8394d_bld_cmi_lcm_drv =
     .get_params     = lcm_get_params,
     .init           = lcm_init,
     .suspend        = lcm_suspend,
-    .resume         = lcm_resume,
+    .resume         = lcm_init,
     .compare_id     = lcm_compare_id,
 };
