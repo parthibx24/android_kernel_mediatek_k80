@@ -378,25 +378,25 @@
 	status = "okay";
 };
 &pio {
-	ctp_pins_default: toucheint4default {
+	ctp_pins_default: toucheint5default {
 	};
-	ctp_pins_eint_as_int: toucheint@4 {
+	ctp_pins_eint_as_int: toucheint@5 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO4__FUNC_EINT4>;
+			pins = <PINMUX_GPIO5__FUNC_EINT5>;
 			slew-rate = <0>;
 			bias-disable;
 		};
 	};
 	ctp_pins_eint_output0: eintoutput0 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO4__FUNC_GPIO4>;
+			pins = <PINMUX_GPIO5__FUNC_GPIO5>;
 			slew-rate = <1>;
 			output-low;
 		};
 	};
 	ctp_pins_eint_output1: eintoutput1 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO4__FUNC_GPIO4>;
+			pins = <PINMUX_GPIO5__FUNC_GPIO5>;
 			slew-rate = <1>;
 			output-high;
 		};
