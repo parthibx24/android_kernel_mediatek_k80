@@ -89,9 +89,9 @@ static void tpd_resume(struct device *h)
 
 #ifdef TPD_CLOSE_POWER_IN_SLEEP
    	TPD_DMESG("TPD wake up\n");
-	ft5x0x_set_rst(false, 5);
+	ft5x0x_set_rst(false, 10);
 	ft5x0x_power(true);
-	ft5x0x_set_rst(true, 20);
+	ft5x0x_set_rst(true, 150);
 #else
 
 #endif
