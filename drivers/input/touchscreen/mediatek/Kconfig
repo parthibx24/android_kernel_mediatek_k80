@@ -200,4 +200,8 @@ config TOUCHSCREEN_MTK_FT5446
 
 source "drivers/input/touchscreen/mediatek/ft5446/Kconfig"
 
+config TOUCHSCREEN_MTK_FTSNOW
+        bool "Focaltech TS (SnowCat) for Mediatek package"
+        default n
+
 endif
