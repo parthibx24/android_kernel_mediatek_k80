@@ -29,8 +29,10 @@ static void ft5x0x_power(bool bOn)
 	}
 
 	if  (bOn)	{
+		ft5x0x_set_rst(false, 10);
 		retval = regulator_enable(tpd->reg);
 	}else{
+		ft5x0x_set_rst(false, 10);
 		retval = regulator_disable(tpd->reg);
 	}
 }
