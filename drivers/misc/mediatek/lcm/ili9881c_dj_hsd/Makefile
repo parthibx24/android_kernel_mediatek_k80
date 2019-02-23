@@ -1,0 +1,1 @@
+obj-y += ili9881c_dj_hsd.o
