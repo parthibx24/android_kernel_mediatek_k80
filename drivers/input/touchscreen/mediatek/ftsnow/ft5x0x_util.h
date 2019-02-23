@@ -265,8 +265,8 @@ static int tpd_power_on(struct i2c_client *client)
 	ft5x0x_power(true);
 	for (reset_count = 0; reset_count < 3; ++reset_count)
 	{
-		ft5x0x_set_rst(false, 5);
-		ft5x0x_set_rst(true, 20);
+		ft5x0x_set_rst(false, 10);
+		ft5x0x_set_rst(true, 150);
 
 		if(fts_read_reg(client, 0x00, &retval) >= 0)
 			return 1;
