@@ -93,4 +93,8 @@ config TOUCHSCREEN_MTK_NT36xxx
 source "drivers/input/touchscreen/mediatek/NT36xxx/Kconfig"
 
 
+config TOUCHSCREEN_MTK_FTSNOW
+        bool "Focaltech TS (SnowCat) for Mediatek package"
+        default n
+
 endif
