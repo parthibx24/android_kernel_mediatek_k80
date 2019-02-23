@@ -357,14 +357,14 @@
 /*ACCDET END*/
 /* TOUCH GPIO standardization */
 &touch {
-	tpd-resolution = <720 1280>;
+	tpd-resolution = <480 854>;
 	use-tpd-button = <1>;
 	tpd-key-num = <3>;
 	tpd-key-local= <139 172 158 0>;
-	tpd-key-dim-local = <120 1350 20 40 360 1350 20 40 600 1350 20 40 0 0 0 0>;
+	tpd-key-dim-local = <80 900 120 40 240 900 120 40 400 900 120 40 0 0 0 0>;
 	tpd-max-touch-num = <5>;
-	tpd-filter-enable = <1>;
-	tpd-filter-pixel-density = <124>;
+	tpd-filter-enable = <0>;
+	tpd-filter-pixel-density = <93>;
 	tpd-filter-custom-prameters = <0 0 0 0 0 0 0 0 0 0 0 0>;
 	tpd-filter-custom-speed = <0 0 0>;
 	pinctrl-names = "default", "state_eint_as_int", "state_eint_output0", "state_eint_output1", "state_rst_output0", "state_rst_output1";
@@ -374,6 +374,7 @@
 	pinctrl-3 = <&ctp_pins_eint_output1>;
 	pinctrl-4 = <&ctp_pins_rst_output0>;
 	pinctrl-5 = <&ctp_pins_rst_output1>;
+	tpd_eint_gpio = <5 6>;
 	status = "okay";
 };
 &pio {
