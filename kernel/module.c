@@ -2708,7 +2708,9 @@ static int check_modinfo(struct module *mod, struct load_info *info, int flags)
 	} else if (!same_magic(modmagic, vermagic, info->index.vers)) {
 		pr_err("%s: version magic '%s' should be '%s'\n",
 		       mod->name, modmagic, vermagic);
+#ifndef CONFIG_MODVERSIONS
 		return -ENOEXEC;
+#endif
 	}
 
 	if (!get_modinfo(info, "intree"))
@@ -2907,6 +2909,7 @@ static int check_module_license_and_versions(struct module *mod)
 #endif
 	return 0;
 }
+
 
 static void flush_module_icache(const struct module *mod)
 {
