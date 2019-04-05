@@ -1,0 +1,5 @@
+
+# load wlan driver after wmt_chrdev_wifi.ko
+on property:wmt_chrdev_wifi.ko=1
+  insmod /vendor/lib/modules/wlan_drv.ko
+  setprop wlan_drv.ko 1
