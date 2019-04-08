@@ -43,6 +43,8 @@ ifdef CONFIG_MTK_COMBO
 	export AUTOCONF_H=$(objtree)/include/generated/autoconf.h
 	export AUTO_CONF=$(objtree)/include/config/auto.conf
 
+	export WMT_SRC_FOLDER=$(src)/combo/common
+
 	obj-y += combo/common/
 	obj-y += combo/wlan/core/gen2/
 	obj-y += combo/wlan/adaptor/

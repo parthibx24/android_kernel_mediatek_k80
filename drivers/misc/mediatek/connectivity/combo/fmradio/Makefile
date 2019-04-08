@@ -59,7 +59,7 @@ endif
 
     MODULE_NAME := fmradio_drv
     obj-m += $(MODULE_NAME).o
-    WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+    WMT_SRC_FOLDER ?= $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
 
     FM_CHIP_MACRO := $(subst ",,$(CONFIG_MTK_FM_CHIP))
     FM_CHIP := $(subst _FM,,$(subst MT,mt,$(subst ",,$(CONFIG_MTK_FM_CHIP))))

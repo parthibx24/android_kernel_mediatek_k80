@@ -54,7 +54,7 @@ ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/mach/$(MTK_PLATFORM)/include/
 
 MODULE_NAME := gps_drv
 obj-m += $(MODULE_NAME).o
-WMT_SRC_FOLDER := $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+WMT_SRC_FOLDER ?= $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
 
 ifneq ($(filter "CONSYS_%",$(CONFIG_MTK_COMBO_CHIP)),)
         ccflags-y += -DSOC_CO_CLOCK_FLAG=1
