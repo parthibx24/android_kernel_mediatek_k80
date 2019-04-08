@@ -37,3 +37,16 @@ else
 default:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) modules
 endif
+
+ifdef CONFIG_MTK_COMBO
+	export KERNEL_DIR=$(srctree)
+	export AUTOCONF_H=$(objtree)/include/generated/autoconf.h
+	export AUTO_CONF=$(objtree)/include/config/auto.conf
+
+	obj-y += combo/common/
+	obj-y += combo/wlan/core/gen2/
+	obj-y += combo/wlan/adaptor/
+	obj-y += combo/bt/mt66xx/
+	obj-y += combo/fmradio/
+	obj-y += combo/gps/
+endif
