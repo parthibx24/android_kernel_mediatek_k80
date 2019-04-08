@@ -22,6 +22,8 @@ endif
 KBUILD_MODPOST_FAIL_ON_WARNINGS := y
 ###############################################################################
 
+WMT_SRC_FOLDER ?= $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
+
 # Driver Configure
 CONFIG_MTK_COMBO_WIFI_HIF=sdio
 CONFIG_MTK_WIFI_ONLY=n
@@ -161,8 +163,8 @@ ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/emi/$(MTK_PLATFORM)
 ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/connectivity/common
 ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/include/mt-plat
 ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/include/mt-plat/$(MTK_PLATFORM)/include/mach/
-ccflags-y += -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/include
-ccflags-y += -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/linux/include
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/include
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/linux/include
 
 MODULE_NAME := wlan_drv
 #obj-$(CONFIG_MTK_COMBO_WIFI) += $(MODULE_NAME).o

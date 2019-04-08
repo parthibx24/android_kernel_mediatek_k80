@@ -39,12 +39,11 @@ ifneq ($(filter "MT6632",$(CONFIG_MTK_COMBO_CHIP)),)
 endif
 
 ###############################################################################
-WMT_SRC_FOLDER ?= $(subst wmt_chrdev_wifi.ko,wmt_drv.ko,$(src))
+WMT_SRC_FOLDER ?= $(TOP)/vendor/mediatek/kernel_modules/connectivity/common
 
-ccflags-y += \
-    -I$(KERNEL_DIR)/drivers/misc/mediatek/include/mt-plat \
-    -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/include \
-    -I$(TOP)/vendor/mediatek/kernel_modules/connectivity/common/common_main/linux/include
+ccflags-y += -I$(KERNEL_DIR)/drivers/misc/mediatek/include/mt-plat
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/include
+ccflags-y += -I$(WMT_SRC_FOLDER)/common_main/linux/include
 
 ifeq ($(CONFIG_MTK_CONN_LTE_IDC_SUPPORT),y)
     ccflags-y += -D WMT_IDC_SUPPORT=1
