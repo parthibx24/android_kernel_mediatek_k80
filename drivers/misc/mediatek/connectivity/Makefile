@@ -45,6 +45,8 @@ ifdef CONFIG_MTK_COMBO
 
 	export WMT_SRC_FOLDER=$(src)/combo/common
 
+	subdir-ccflags-y += -Wno-error -Wno-error=undef -Wno-error=unused-variable
+
 	obj-y += combo/common/
 	obj-y += combo/wlan/core/gen2/
 	obj-y += combo/wlan/adaptor/
