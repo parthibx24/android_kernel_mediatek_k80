@@ -70,5 +70,5 @@ ifeq ($(CONFIG_MTK_TC10_FEATURE), y)
 endif
 
 # Wi-Fi character device driver
-obj-m += wmt_chrdev_wifi.o
+obj-$(CONFIG_MTK_COMBO_WIFI) += wmt_chrdev_wifi.o
 
