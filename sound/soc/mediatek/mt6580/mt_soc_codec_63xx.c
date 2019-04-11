@@ -1300,7 +1300,7 @@ static void Audio_Amp_Change(int channels, bool enable)
 			Ana_Set_Reg(AUDTOP_CON5, 0x0014, 0xffff);	/* set RCH/LCH buffer gain to smallest -5dB */
 			if (mIsExtSPKUse) {
 				/* enable audio bias. only enable audio-R DAC, HP buffers (L needs to turn off) */
-				Ana_Set_Reg(AUDTOP_CON4, 0x005C, 0xffff);
+				Ana_Set_Reg(AUDTOP_CON4, 0x007C, 0xffff);
 			} else {
 				/* enable audio bias. enable audio DAC, HP buffers */
 				Ana_Set_Reg(AUDTOP_CON4, 0x007C, 0xffff);
