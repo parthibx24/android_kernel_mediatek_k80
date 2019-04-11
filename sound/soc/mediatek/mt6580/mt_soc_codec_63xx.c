@@ -68,6 +68,7 @@
 #include "AudDrv_Afe.h"
 #include "AudDrv_Ana.h"
 #include "AudDrv_Clk.h"
+#include "AudDrv_Gpio.h"
 #include "mt_soc_analog_type.h"
 #include <mach/mt_clkbuf_ctl.h>
 
