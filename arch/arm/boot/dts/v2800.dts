@@ -329,14 +329,14 @@
 
 &accdet {
 	accdet-mic-vol = <7>;
-	headset-mode-setting = <0x500 0x200 1 0x1F0 0x800 0x800 0x20>;
+	headset-mode-setting = <0x500 0x600 1 0x1F0 0x800 0x800 0x20>;
 	accdet-plugout-debounce = <20>;
 	/*1:ACC mode, 2:low cost without in bias, 6:low cost with in bias*/
 	accdet-mic-mode = <1>;
 	/*0--MD_MAX--UP_MAX--DW_MAX*/
 	headset-three-key-threshold = <0 90 240 500>;
 	/*0--MD_MAX--VOICE_MAX--UP_MAX--DW_MAX*/
-	headset-four-key-threshold = <0 60 126 201 450>;
+	headset-four-key-threshold = <0 59 123 195 450>;
 	/* ACCDET GPIO standardization ACC mode use */
 	pinctrl-names = "default", "state_eint_as_int";
 	pinctrl-0 = <&ACCDET_pins_default>;
@@ -346,9 +346,9 @@
 &pio {
 	ACCDET_pins_default: eint1default {
 	};
-	ACCDET_pins_eint_as_int: eint@1 {
+	ACCDET_pins_eint_as_int: eint@0 {
 		pins_cmd_dat {
-			pins = <PINMUX_GPIO1__FUNC_EINT1>;
+			pins = <PINMUX_GPIO0__FUNC_EINT0>;
 			slew-rate = <0>;
 			bias-disable;
 		};
