@@ -12,3 +12,4 @@
 #
 
 obj-y				+= kd_camera_hw.o
+obj-y				+= kd_camera_hw-legacy.o
