@@ -387,78 +387,7 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_ON]);
 
 			mdelay(20);
-		} else if (currSensorName
-			   && (0 == strcmp(SENSOR_DRVNAME_GC2355_MIPI_RAW, currSensorName))) {
-			mtkcam_gpio_set(pinSetIdx, CAMLDO, 1);
-			/* First Power Pin low and Reset Pin Low */
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMPDN])
-				mtkcam_gpio_set(pinSetIdx, CAMPDN,
-						pinSet[pinSetIdx][IDX_PS_CMPDN + IDX_PS_OFF]);
 
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMRST])
-				mtkcam_gpio_set(pinSetIdx, CAMRST,
-						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
-
-			mdelay(50);
-
-			/* VCAM_A */
-			if (TRUE != _hwPowerOn(VCAMA, VOL_2800)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to enable analog power (VCAM_A),power id = %d\n",
-				     VCAMA);
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			mdelay(10);
-
-			/* VCAM_IO */
-			if (TRUE != _hwPowerOn(VCAMIO, VOL_1800)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to enable IO power (VCAM_IO),power id = %d\n",
-				     VCAMIO);
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			mdelay(10);
-
-			if (TRUE != _hwPowerOn(VCAMD, VOL_1500)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to enable digital power (VCAM_D),power id = %d\n",
-				     VCAMD);
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			mdelay(10);
-
-			/* AF_VCC */
-			if (TRUE != _hwPowerOn(VCAMAF, VOL_2800)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to enable analog power (VCAM_AF),power id = %d\n",
-				     VCAMAF);
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-
-			mdelay(50);
-
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMRST]) {
-				mtkcam_gpio_set(pinSetIdx, CAMRST,
-						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
-				mdelay(5);
-				mtkcam_gpio_set(pinSetIdx, CAMRST,
-						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_ON]);
-			}
-			mdelay(5);
-			/* enable active sensor */
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMPDN]) {
-				mtkcam_gpio_set(pinSetIdx, CAMPDN,
-						pinSet[pinSetIdx][IDX_PS_CMPDN + IDX_PS_ON]);
-				mdelay(5);
-				mtkcam_gpio_set(pinSetIdx, CAMPDN,
-						pinSet[pinSetIdx][IDX_PS_CMPDN + IDX_PS_OFF]);
-			}
-
-			mdelay(5);
 		} else if (currSensorName
 			   && (0 == strcmp(SENSOR_DRVNAME_GC0310_YUV, currSensorName))) {
 			/* First Power Pin low and Reset Pin Low */
@@ -686,52 +615,6 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 			if (TRUE != _hwPowerDown(VCAMAF)) {
 				PK_DBG
 				    ("[CAMERA SENSOR] Fail to OFF AF power (VCAM_AF), power id = %d\n",
-				     VCAMAF);
-				/* return -EIO; */
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-		} else if (currSensorName &&
-			   (0 == strcmp(SENSOR_DRVNAME_GC2355_MIPI_RAW, currSensorName))) {
-			mtkcam_gpio_set(pinSetIdx, CAMLDO, 0);
-			/* Set Power Pin low and Reset Pin Low */
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMPDN])
-				mtkcam_gpio_set(pinSetIdx, CAMPDN,
-						pinSet[pinSetIdx][IDX_PS_CMPDN + IDX_PS_ON]);
-
-			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMRST])
-				mtkcam_gpio_set(pinSetIdx, CAMRST,
-						pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
-
-			if (TRUE != _hwPowerDown(VCAMD)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to OFF core power (VCAM_D),power id = %d\n",
-				     VCAMD);
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			/* VCAM_A */
-			if (TRUE != _hwPowerDown(VCAMA)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to OFF analog power (VCAM_A),power id= (%d)\n",
-				     VCAMA);
-				/* return -EIO; */
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			/* VCAM_IO */
-			if (TRUE != _hwPowerDown(VCAMIO)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to OFF digital power (VCAM_IO),power id = %d\n",
-				     VCAMIO);
-				/* return -EIO; */
-				goto _kdCISModulePowerOn_exit_;
-			}
-
-			/* AF_VCC */
-			if (TRUE != _hwPowerDown(VCAMAF)) {
-				PK_DBG
-				    ("[CAMERA SENSOR] Fail to OFF AF power (VCAM_AF),power id = %d\n",
 				     VCAMAF);
 				/* return -EIO; */
 				goto _kdCISModulePowerOn_exit_;
