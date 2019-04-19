@@ -39,6 +39,10 @@ LCM_DRIVER *lcm_driver_list[] = {
     &jd9161_fwvga_dsi_vdo_dj_lcm_drv,
 #endif
 
+#if defined(ILI9806E_FWVGA_DSI_VDO_ZGD)
+    &ili9806e_fwvga_dsi_vdo_zgd_lcm_drv,
+#endif
+
 #if defined(HX8394D_BLD_CMI)
     &hx8394d_bld_cmi_lcm_drv,
 #endif
