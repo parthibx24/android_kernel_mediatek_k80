@@ -762,11 +762,5 @@ _kdCISModulePowerOn_exit_:
 
 }
 
-#endif
-
-
-
 EXPORT_SYMBOL(kdCISModulePowerOn);
-
-/* !-- */
-/*  */
+#endif
