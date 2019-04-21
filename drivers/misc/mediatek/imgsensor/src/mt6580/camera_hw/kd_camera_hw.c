@@ -451,27 +451,11 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 			    mtkcam_gpio_set(pinSetIdx, CAMRST,
 			                    pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
 
-			mdelay(10);
-
-			if(!_hwPowerOn(VCAMIO, VOL_1800))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(1);
-
-			if(!_hwPowerOn(VCAMA, VOL_2800))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(1);
-
-			if(!_hwPowerOn(VCAMD, VOL_1200))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(5);
-
-			if(!_hwPowerOn(VCAMAF, VOL_2800))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(10);
+			// PowerOn stuffs
+			_hwPowerOn(VCAMIO, VOL_1800) ? mdelay(1) : goto _kdCISModulePowerOn_exit_;
+			_hwPowerOn(VCAMA, VOL_2800)  ? mdelay(1) : goto _kdCISModulePowerOn_exit_;
+			_hwPowerOn(VCAMD, VOL_1200)  ? mdelay(5) : goto _kdCISModulePowerOn_exit_;
+			_hwPowerOn(VCAMAF, VOL_2800) ? mdelay(9) : goto _kdCISModulePowerOn_exit_;
 
 			// enable active sensor
 			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMPDN])
@@ -496,22 +480,10 @@ int kdCISModulePowerOn(CAMERA_DUAL_CAMERA_SENSOR_ENUM SensorIdx, char *currSenso
 			    mtkcam_gpio_set(pinSetIdx, CAMRST,
 			                    pinSet[pinSetIdx][IDX_PS_CMRST + IDX_PS_OFF]);
 
-			mdelay(10);
-
-			if(!_hwPowerOn(VCAMIO, VOL_1800))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(1);
-
-			if(!_hwPowerOn(VCAMA, VOL_2800))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(1);
-
-			if(!_hwPowerOn(VCAMD, VOL_1200))
-			    goto _kdCISModulePowerOn_exit_;
-
-			mdelay(10);
+			// PowerOn stuffs
+			_hwPowerOn(VCAMIO, VOL_1800) ? mdelay(1) : goto _kdCISModulePowerOn_exit_;
+			_hwPowerOn(VCAMA, VOL_2800)  ? mdelay(1) : goto _kdCISModulePowerOn_exit_;
+			_hwPowerOn(VCAMD, VOL_1200)  ? mdelay(5) : goto _kdCISModulePowerOn_exit_;
 
 			// enable active sensor
 			if (GPIO_CAMERA_INVALID != pinSet[pinSetIdx][IDX_PS_CMPDN])
