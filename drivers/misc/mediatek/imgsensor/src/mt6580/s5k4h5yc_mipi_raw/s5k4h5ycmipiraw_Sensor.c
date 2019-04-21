@@ -143,7 +143,7 @@ static imgsensor_info_struct imgsensor_info = {
 	//modiby by yangbo for rf interference
 	.mclk = 26, //24
 	.mipi_lane_num = SENSOR_MIPI_4_LANE,
-	.i2c_addr_table = {0x30},
+	.i2c_addr_table = {0x20},
     .i2c_speed = 300, 
 };
 
@@ -1349,7 +1349,7 @@ static kal_uint32 get_imgsensor_id(UINT32 *sensor_id)
 	//sensor have two i2c address 0x6c 0x6d & 0x21 0x20, we should detect the module used i2c address
 	//while (imgsensor_info.i2c_addr_table[i] != 0xff) {
 		spin_lock(&imgsensor_drv_lock);
-		imgsensor.i2c_write_id = 0x30;//imgsensor_info.i2c_addr_table[i];
+		imgsensor.i2c_write_id = 0x6c;//imgsensor_info.i2c_addr_table[i];
 		spin_unlock(&imgsensor_drv_lock);
 		do {
 			*sensor_id = ((read_cmos_sensor(0x0000) << 8) | read_cmos_sensor(0x0001));
@@ -1403,7 +1403,7 @@ static kal_uint32 open(void)
 	//sensor have two i2c address 0x6c 0x6d & 0x21 0x20, we should detect the module used i2c address
 	//while (imgsensor_info.i2c_addr_table[i] != 0xff) {
 		spin_lock(&imgsensor_drv_lock);
-		imgsensor.i2c_write_id = 0x30;//imgsensor_info.i2c_addr_table[i];
+		imgsensor.i2c_write_id = 0x6c;//imgsensor_info.i2c_addr_table[i];
 		spin_unlock(&imgsensor_drv_lock);
 		do {
 			sensor_id = ((read_cmos_sensor(0x0000) << 8) | read_cmos_sensor(0x0001));
