@@ -16,6 +16,11 @@
 		reg = <0x36>;
 		status = "okay";
 	};
+	camera_main_af_mtk:camera_main_af@0c {
+		compatible = "mediatek,camera_main_af";
+		reg = <0x0c>;
+		status = "okay";
+	}; 
 	camera_sub_mtk:camera_sub@21 {
 		compatible = "mediatek,camera_sub";
 		reg = <0x21>;
