@@ -198,11 +198,14 @@ disp_lcm_handle *disp_lcm_probe(char *plcm_name, LCM_INTERFACE_ID lcm_id)
 			DISPMSG("LCM not init\n");
 		} else {
 			lcm_drv = lcm_driver_list[0];
+
 			if (strcmp(lcm_drv->name, plcm_name)) {
 				DISPERR
 				    ("FATAL ERROR!!!LCM Driver defined in kernel(%s) is different with LK(%s)\n",
 				     lcm_drv->name, plcm_name);
+#if !defined(UNIVERXAL)
 				return NULL;
+#endif
 			}
 
 			isLCMInited = true;
@@ -232,6 +235,13 @@ disp_lcm_handle *disp_lcm_probe(char *plcm_name, LCM_INTERFACE_ID lcm_id)
 		}
 		/* TODO: */
 	}
+
+#if defined(UNIVERXAL)
+	DISPERR("[UNIVERXAL]: fuck %s, we're usin' univerxal\n", plcm_name);
+	lcmindex = 0;
+	isLCMInited = true;
+	isLCMFound = true;
+#endif
 
 	if (isLCMFound == false) {
 		DISPERR("FATAL ERROR!!!No LCM Driver defined\n");
@@ -292,6 +302,10 @@ int disp_lcm_init(disp_lcm_handle *plcm, int force)
 	DISPMSG("[DISP] %s\n", __func__);
 	if (_is_lcm_inited(plcm)) {
 		lcm_drv = plcm->drv;
+
+#if defined(UNIVERXAL)
+		if(1) return 0;
+#endif
 
 		if (lcm_drv->init_power) {
 			if (!disp_lcm_is_inited(plcm) || force) {

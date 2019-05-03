@@ -278,6 +278,8 @@ extern LCM_DRIVER ili9881c_dj_hsd_lcm_drv;
 extern LCM_DRIVER jd9161_fwvga_dsi_vdo_dj_lcm_drv;
 extern LCM_DRIVER ili9806e_fwvga_dsi_vdo_zgd_lcm_drv;
 
+extern LCM_DRIVER univerxal;
+
 #ifdef BUILD_LK
 extern void mdelay(unsigned long msec);
 #endif
