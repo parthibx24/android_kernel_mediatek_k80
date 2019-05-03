@@ -1427,6 +1427,10 @@
 			compatible = "mediatek,mtkfb";
 		};
 
+        flashlightgpio:gpio_flashlight{
+			compatible = "mediatek,gpio_flashlight";
+		};
+
 		dsi_te: dsi_te {
 			compatible = "mediatek, dsi_te-eint";
 		};

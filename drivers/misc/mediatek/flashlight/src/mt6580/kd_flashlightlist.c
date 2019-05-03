@@ -1,16 +1,3 @@
-/*
- * Copyright (C) 2015 MediaTek Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- */
-
 #ifdef WIN32
 #include "win_test.h"
 #include "stdio.h"
@@ -657,6 +644,10 @@ static struct device *flashlight_device;
 static struct flashlight_data flashlight_private;
 static dev_t flashlight_devno;
 static struct cdev flashlight_cdev;
+/* Vanzo:yangzhihong on: Mon, 18 Jan 2016 21:18:19 +0800
+ */
+extern int flashlight_gpio_init(struct platform_device *pdev);
+// End of Vanzo:yangzhihong
 /* ======================================================================== */
 #define ALLOC_DEVNO
 static int flashlight_probe(struct platform_device *dev)
@@ -713,6 +704,11 @@ static int flashlight_probe(struct platform_device *dev)
 	/* init_MUTEX(&flashlight_private.sem); */
 	sema_init(&flashlight_private.sem, 1);
 
+/* Vanzo:yangzhihong on: Mon, 18 Jan 2016 21:04:02 +0800
+ */
+    flashlight_gpio_init(dev);
+// End of Vanzo:yangzhihong
+
 	logI("[flashlight_probe] Done ~");
 	return 0;
 
@@ -754,6 +750,12 @@ static void flashlight_shutdown(struct platform_device *dev)
 	checkAndRelease();
 	logI("[flashlight_shutdown] Done ~");
 }
+ #ifdef CONFIG_OF
+ static const struct of_device_id flashlight_match_table[] = {
+     { .compatible = "mediatek,gpio_flashlight", },
+     {}
+ };
+ #endif
 
 static struct platform_driver flashlight_platform_driver = {
 	.probe = flashlight_probe,
@@ -762,27 +764,33 @@ static struct platform_driver flashlight_platform_driver = {
 	.driver = {
 		   .name = FLASHLIGHT_DEVNAME,
 		   .owner = THIS_MODULE,
+ #ifdef CONFIG_OF
+            .of_match_table = flashlight_match_table,
+ #endif
 		   },
 };
 
+#if 0
 static struct platform_device flashlight_platform_device = {
 	.name = FLASHLIGHT_DEVNAME,
 	.id = 0,
 	.dev = {
 		}
 };
+#endif
 
 static int __init flashlight_init(void)
 {
 	int ret = 0;
 
 	logI("[flashlight_probe] start ~");
-
+#if 0
 	ret = platform_device_register(&flashlight_platform_device);
 	if (ret) {
 		logI("[flashlight_probe] platform_device_register fail ~");
 		return ret;
 	}
+#endif
 
 	ret = platform_driver_register(&flashlight_platform_driver);
 	if (ret) {
