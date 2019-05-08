@@ -1,0 +1,1 @@
+obj-y += st7701_fwvga_dsi_vdo_cpt.o

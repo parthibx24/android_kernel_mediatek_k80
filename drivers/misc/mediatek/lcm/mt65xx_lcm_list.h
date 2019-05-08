@@ -276,6 +276,7 @@ extern LCM_DRIVER hx8394d_bld_cmi_lcm_drv; /* V060_m_new (V060C6), V060C6_2G */
 extern LCM_DRIVER hx8394f_bld_cmi_lcm_drv; /* V060_L */
 extern LCM_DRIVER ili9881c_dj_hsd_lcm_drv;
 extern LCM_DRIVER jd9161_fwvga_dsi_vdo_dj_lcm_drv;
+extern LCM_DRIVER st7701_fwvga_dsi_vdo_cpt_lcm_drv;
 
 #ifdef BUILD_LK
 extern void mdelay(unsigned long msec);
