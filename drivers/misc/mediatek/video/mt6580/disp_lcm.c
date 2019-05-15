@@ -203,9 +203,6 @@ disp_lcm_handle *disp_lcm_probe(char *plcm_name, LCM_INTERFACE_ID lcm_id)
 				DISPERR
 				    ("FATAL ERROR!!!LCM Driver defined in kernel(%s) is different with LK(%s)\n",
 				     lcm_drv->name, plcm_name);
-#if !defined(UNIVERXAL)
-				return NULL;
-#endif
 			}
 
 			isLCMInited = true;
