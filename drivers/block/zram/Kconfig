@@ -1,0 +1,37 @@
+config ZRAM
+	tristate "Compressed RAM block device support"
+	depends on BLOCK && SYSFS && ZSMALLOC && CRYPTO
+	select CRYPTO_LZO
+	default n
+	help
+	  Creates virtual block devices called /dev/zramX (X = 0, 1, ...).
+	  Pages written to these disks are compressed and stored in memory
+	  itself. These disks allow very fast I/O and compression provides
+	  good amounts of memory savings.
+
+	  It has several use cases, for example: /tmp storage, use as swap
+	  disks and maybe many more.
+
+	  See zram.txt for more information.
+
+config EXTREME_LOW_RAM
+	bool "Support the device with memory smaller than 512M"
+	default n
+	help
+	  This config decide if device memory < 512M
+	  For 512M device, it has many low mem shrinking mechanism
+	  Normal project will disable it first
+	  If you are not sure about this, do not set it to y
+
+config ZRAM_LZ4_COMPRESS
+	bool "Enable LZ4 algorithm support"
+	depends on ZRAM
+	select LZ4_COMPRESS
+	select CRYPTO_LZ4
+	select CRYPTO_LZ4HC if EXTREME_LOW_RAM
+	select LZ4_DECOMPRESS
+	default n
+	help
+	  This option enables LZ4 compression algorithm support. Compression
+	  algorithm can be changed using 'comp_algorithm' device attribute.
+

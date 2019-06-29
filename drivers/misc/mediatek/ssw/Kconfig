@@ -1,0 +1,5 @@
+config CUSTOM_KERNEL_SSW
+	string "CUSTOM_KERNEL_SSW"
+	help
+	  To choose kernel sim switch driver
+	  ssw_single_v2: internal switcher for mt6735 serials
