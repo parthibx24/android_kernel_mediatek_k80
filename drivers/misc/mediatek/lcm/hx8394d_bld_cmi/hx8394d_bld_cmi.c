@@ -10,7 +10,7 @@
 
 /* Local Constants */
 #define LCM_NAME "hx8394d_bld_cmi"
-#define LCM_VERSION "19.221" /* YEAR+"."+MONTH+DATE */
+#define LCM_VERSION "19.810" /* YEAR+"."+MONTH+DATE */
 #define LCM_ID (0x83940D)
 #define FRAME_WIDTH  (720)
 #define FRAME_HEIGHT (1280)
@@ -40,16 +40,16 @@
 
 /* LCM Driver Implementations */
 
-static LCM_UTIL_FUNCS lcm_util = { 0 };
+static struct LCM_UTIL_FUNCS lcm_util = { 0 };
 
-static void lcm_set_util_funcs(const LCM_UTIL_FUNCS *util)
+static void lcm_set_util_funcs(const struct LCM_UTIL_FUNCS *util)
 {
-    memcpy(&lcm_util, util, sizeof(LCM_UTIL_FUNCS));
+    memcpy(&lcm_util, util, sizeof(struct LCM_UTIL_FUNCS));
 }
 
-static void lcm_get_params(LCM_PARAMS *params)
+static void lcm_get_params(struct LCM_PARAMS *params)
 {
-    memset(params, 0, sizeof(LCM_PARAMS));
+    memset(params, 0, sizeof(struct LCM_PARAMS));
 
     params->type = 2;
 
@@ -269,7 +269,7 @@ static void lcm_suspend(void)
 }
 
 /* Get LCM Driver Hooks */
-LCM_DRIVER hx8394d_bld_cmi_lcm_drv =
+struct LCM_DRIVER hx8394d_bld_cmi_lcm_drv =
 {
     .name           = LCM_NAME,
     .set_util_funcs = lcm_set_util_funcs,
