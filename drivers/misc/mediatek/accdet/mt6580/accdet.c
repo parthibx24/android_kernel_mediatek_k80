@@ -32,6 +32,7 @@ static int g_FourKey_ADC_channel = AUX_IN2_KEY;
 
 #define REGISTER_VALUE(x)   (x - 1)
 static int button_press_debounce = 0x400;
+#define KEY_WAKEUP 143
 int cur_key = 0;
 struct head_dts_data accdet_dts_data;
 s8 accdet_auxadc_offset;
@@ -505,6 +506,7 @@ static void send_accdet_status_event(int cable_type, int status)
 	case HEADSET_NO_MIC:
 		input_report_switch(kpd_accdet_dev, SW_HEADPHONE_INSERT, status);
 		input_report_switch(kpd_accdet_dev, SW_JACK_PHYSICAL_INSERT, status);
+		input_report_key(kpd_accdet_dev, KEY_WAKEUP, 1); 
 		input_sync(kpd_accdet_dev);
 		ACCDET_DEBUG("[accdet]Headphone(3-pole)%s\n", status?"PlugIn":"PlugOut");
 		break;
@@ -512,6 +514,7 @@ static void send_accdet_status_event(int cable_type, int status)
 		input_report_switch(kpd_accdet_dev, SW_MICROPHONE_INSERT, status);
 		input_report_switch(kpd_accdet_dev, SW_HEADPHONE_INSERT, status);
 		input_report_switch(kpd_accdet_dev, SW_JACK_PHYSICAL_INSERT, status);
+		input_report_key(kpd_accdet_dev, KEY_WAKEUP, 1);
 		input_sync(kpd_accdet_dev);
 		ACCDET_DEBUG("[accdet]MICROPHONE(4-pole) %s\n",
 			status?"PlugIn":"PlugOut");
@@ -1243,6 +1246,7 @@ int mt_accdet_probe(struct platform_device *dev)
 
 	/*define multi-key keycode*/
 	__set_bit(EV_KEY, kpd_accdet_dev->evbit);
+	__set_bit(KEY_WAKEUP, kpd_accdet_dev->evbit);
 	__set_bit(KEY_PLAYPAUSE, kpd_accdet_dev->keybit);
 	__set_bit(KEY_VOLUMEDOWN, kpd_accdet_dev->keybit);
 	__set_bit(KEY_VOLUMEUP, kpd_accdet_dev->keybit);
