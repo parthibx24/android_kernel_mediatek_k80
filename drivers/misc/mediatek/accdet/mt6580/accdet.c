@@ -32,7 +32,6 @@ static int g_FourKey_ADC_channel = AUX_IN2_KEY;
 
 #define REGISTER_VALUE(x)   (x - 1)
 static int button_press_debounce = 0x400;
-#define KEY_WAKEUP 143
 int cur_key = 0;
 struct head_dts_data accdet_dts_data;
 s8 accdet_auxadc_offset;
