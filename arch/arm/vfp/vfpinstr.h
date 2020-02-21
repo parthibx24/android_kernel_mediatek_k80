@@ -65,21 +65,17 @@
 #define FPSCR_C (1 << 29)
 #define FPSCR_V	(1 << 28)
 
-/*
- * Since we aren't building with -mfpu=vfp, we need to code
- * these instructions using their MRC/MCR equivalents.
- */
-#define vfpreg(_vfp_) #_vfp_
-
 #define fmrx(_vfp_) ({			\
 	u32 __v;			\
-	asm("mrc p10, 7, %0, " vfpreg(_vfp_) ", cr0, 0 @ fmrx	%0, " #_vfp_	\
+	asm(".fpu	vfpv2\n"	\
+	    "vmrs	%0, " #_vfp_	\
 	    : "=r" (__v) : : "cc");	\
 	__v;				\
  })
 
 #define fmxr(_vfp_,_var_)		\
-	asm("mcr p10, 7, %0, " vfpreg(_vfp_) ", cr0, 0 @ fmxr	" #_vfp_ ", %0"	\
+	asm(".fpu	vfpv2\n"	\
+	    "vmsr	" #_vfp_ ", %0"	\
 	   : : "r" (_var_) : "cc")
 
 u32 vfp_single_cpdo(u32 inst, u32 fpscr);
