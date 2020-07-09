@@ -1,0 +1,44 @@
+config MTK_CLKMGR
+	bool "Mediatek proprietary clock management"
+	default n
+	---help---
+	  Mediatek proprietary clock management is used to operate
+	  the clocks. The clocks are composed of CG, MUX, PLL,
+	  non-MTCMOS. The operations of clocks are enabling,
+	  disabling, and querying status. If this config is not set,
+	  system will use COMMON_CLK instead.
+
+config MTK_UNIFY_POWER
+	bool "MTK UNIFY POWER"
+	default n
+	---help---
+	  This kernel config can be used to enable unified power table.
+	  This table can provide power data and capacity to someone who
+	  need it.
+	  If unsure, say Y.
+
+config MTK_CM_MGR
+	bool "MTK CM MGR"
+	default n
+	---help---
+	  This kernel config can be used to enable CM MGR. When enable
+	  this option, dram opp level will be changed which will depended
+	  on power table.
+	  If unsure, say N.
+
+config CPU_FORCE_TO_BIN2
+	bool "Read extra efuse for BIN2 IC"
+	default n
+	---help---
+	  This kernel config can be used to force cpu to segment BIN2.
+	  When enable this option, eem driver will read extra efuse to
+	  obtain parameters for segment BIN2 IC.
+	  If unsure, say N.
+
+config MTK_LP_OPP
+	bool "MTK LP OPP"
+	default n
+	---help---
+	  This kernel config can be used to enable MTK LP OPP. When enable
+	  this option, cpudvfs opp will be changed for low power.
+	  If unsure, say N.

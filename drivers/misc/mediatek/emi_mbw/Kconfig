@@ -1,0 +1,4 @@
+config MTK_EMI_MBW
+	bool "enable MTK_EMI_MBW"
+	help
+	  This enable MTK_EMI_MBW
