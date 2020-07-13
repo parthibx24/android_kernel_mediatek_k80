@@ -2,6 +2,7 @@ config ARM64
 	def_bool y
 	select ARCH_BINFMT_ELF_RANDOMIZE_PIE
 	select ARCH_HAS_ATOMIC64_DEC_IF_POSITIVE
+	select ARCH_HAS_KCOV
 	select ARCH_HAS_SG_CHAIN
 	select ARCH_HAS_TICK_BROADCAST if GENERIC_CLOCKEVENTS_BROADCAST
 	select ARCH_USE_CMPXCHG_LOCKREF
@@ -77,6 +78,7 @@ config ARM64
 	select SPARSE_IRQ
 	select SYSCTL_EXCEPTION_TRACE
 	select HAVE_CONTEXT_TRACKING
+	select DT_IDLE_STATES
 	help
 	  ARM 64-bit (AArch64) Linux support.
 
@@ -119,10 +121,6 @@ config ARCH_MMAP_RND_COMPAT_BITS_MAX
 config NO_IOPORT_MAP
 	def_bool y if !PCI
 
-config ILLEGAL_POINTER_VALUE
-	hex
-	default 0xdead000000000000
-
 config STACKTRACE_SUPPORT
 	def_bool y
 
@@ -143,7 +141,7 @@ config GENERIC_HWEIGHT
 	def_bool y
 
 config GENERIC_CSUM
-        def_bool y
+	def_bool y
 
 config GENERIC_CALIBRATE_DELAY
 	def_bool y
@@ -206,12 +204,314 @@ config ARCH_VEXPRESS
 	  This enables support for the ARMv8 software model (Versatile
 	  Express).
 
+config ARCH_MEDIATEK
+	bool
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select PINCTRL
+	select MFD_SYSCON
+
+config ARCH_MT6735
+	bool "MediaTek MT6735"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYSTRACKER
+	select MTK_SYS_CIRQ
+	select MTK_EIC
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select PINCTRL
+	select PINCTRL_MT6735
+	select MFD_SYSCON
+	select MTK_BASE_POWER
+	select MTK_GIC
+	select ARM64_ERRATUM_843419
+	select ARM64_ERRATUM_845719
+	select ARM64_ERRATUM_836870
+	select MTK_IRQ_NEW_DESIGN
+	select MTK_IRQ_NEW_DESIGN_DEBUG
+	select MTK_POWER_GS
+	select MTK_CPU_STRESS
+	help
+	  This enable support for MediaTek MT6735
+
+config ARCH_MT6753
+	bool "MediaTek MT6753"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYSTRACKER
+	select MTK_SYS_CIRQ
+	select MTK_EIC
+	select MTK_GIC
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select ARM_MT6735_CPUIDLE
+	select MTK_BASE_POWER
+	select PINCTRL
+	select PINCTRL_MT6735
+	select MFD_SYSCON
+	select ARM64_ERRATUM_843419
+	select ARM64_ERRATUM_845719
+	select ARM64_ERRATUM_836870
+	select MTK_IRQ_NEW_DESIGN
+	select MTK_IRQ_NEW_DESIGN_DEBUG
+	select MTK_POWER_GS
+	select MTK_CPU_STRESS
+	help
+	  This enable support for MediaTek MT6753
+	  To enable related drivers
+	  support for k53v1_64 related project
+	  support for k53v1_64_op02 project
+
+config ARCH_MT6755
+	bool "MediaTek MT6755"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYS_CIRQ
+	select MTK_EIC
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select PINCTRL
+	select PINCTRL_MT6755
+	select MFD_SYSCON
+	select MTK_BASE_POWER
+	select MTK_GIC
+	select ARM64_ERRATUM_843419
+	select ARM64_ERRATUM_845719
+	select ARM64_ERRATUM_836870
+	select ARM64_ERRATUM_855873
+	select MTK_POWER_GS
+	select MTK_SYSTRACKER_V2
+	select MTK_LM_MODE if !MTK_GMO_RAM_OPTIMIZE
+	select MTK_IRQ_NEW_DESIGN
+	select MTK_IRQ_NEW_DESIGN_DEBUG
+	select MTK_USB2JTAG_SUPPORT
+	select MTK_SEC_DEINT_SUPPORT
+	select MTK_TIMER
+	help
+	  This enables support for MediaTek MT6755
+	  Support for aarch64/aarch32 Architecture
+	  Support for evb6755 related projects
+	  Support for k55 related projects
+
+config ARCH_MT6755_TURBO
+	bool "MediaTek MT6755 Turbo"
+	help
+	  This enables support for MediaTek MT6755 turbo mode
+	  Support for k55tv1 related projects
+	  CPU: 1.25 + 2.15 GHZ
+	  GPU: 800 HMZ
+
+config ARCH_MT6757
+	bool "MediaTek MT6757"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYS_CIRQ
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select PINCTRL
+	select PINCTRL_MT6757
+	select MFD_SYSCON
+	select MTK_BASE_POWER
+	select ARM64_ERRATUM_843419
+	select MTK_SYSTRACKER_V2
+	select MTK_GIC_V3_EXT
+	select MTK_CPU_STRESS
+	select MTK_LM_MODE if !MTK_GMO_RAM_OPTIMIZE
+	select MTK_EIC_HISTORY_DUMP
+	select MTK_TIMER
+	help
+	  This enables support for MediaTek MT6757
+	  Support for aarch64/aarch32 Architecture
+	  Support for fpga6757_64 related projects
+	  Support for evb6757_64 related projects
+	  Support for k57_64 related projects
+
+config ARCH_MT6797
+	bool "MediaTek MT6797"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYS_CIRQ
+	select MTK_EIC
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select PINCTRL
+	select PINCTRL_MT6797
+	select MFD_SYSCON
+	select MTK_BASE_POWER
+	select ARM64_ERRATUM_843419
+	select MTK_POWER_GS
+	select MTK_SYSTRACKER_V2
+	select MTK_GIC_V3_EXT
+	select MTK_CPU_STRESS
+	select MTK_LM_MODE if !MTK_GMO_RAM_OPTIMIZE
+	select MTK_EIC_HISTORY_DUMP
+	select MTK_USB2JTAG_SUPPORT
+	select MTK_IRQ_NEW_DESIGN
+	select MTK_IRQ_NEW_DESIGN_DEBUG
+	select MTK_SEC_DEINT_SUPPORT
+	help
+	  This enables support for MediaTek MT6797
+	  Support for aarch64/aarch32 Architecture
+	  Support for fpga6797_64 related projects
+	  Support for evb6797_64 related projects
+	  Support for k97_64 related projects
+
+config ARCH_ELBRUS
+        bool "MediaTek ELBRUS"
+        select PINCTRL
+		select PINCTRL_ELBRUS
+		select MFD_SYSCON
+        select MTK_FPGA
+        select FPGA_EARLY_PORTING
+        select MTK_EIC
+        select MTK_SYSTRACKER_V2
+        select CPU_IDLE
+        select MTK_BASE_POWER
+        select MTK_TIMER
+	select MTK_GIC_V3_EXT
+
+        help
+          This enables support for MediaTek Elbrus
+
+config ARCH_MT8163
+	bool "MediaTek MT8163"
+	select ARCH_MEDIATEK
+	select MTK_BASE_POWER
+	select MTK_SYS_CIRQ
+	select MTK_GIC_EXT
+	select MTK_SYSTRACKER
+	help
+	  This enable support for MediaTek MT8163. If you need support
+	  for MediaTek MT8163, say Y here.
+	  Please note this also select ARCH_MEDIATEK, so driver depends
+	  on it can be selected.
+
+config ARCH_MT8167
+	bool "MediaTek MT8167"
+	select ARCH_MEDIATEK
+	select MTK_BASE_POWER
+	select MTK_SYS_CIRQ
+	select MTK_GIC_EXT
+	select MTK_SYSTRACKER
+	select MTK_TIMER
+	help
+	  This enable support for MediaTek MT8167. If you need support
+	  for MediaTek MT8167, say Y here.
+	  Please note this also select ARCH_MEDIATEK, so driver depends
+	  on it can be selected.
+
+config ARCH_MT8173
+	bool "MediaTek MT8173"
+	select ARCH_MEDIATEK
+	select MTK_BASE_POWER
+	select MTK_SYS_CIRQ
+	select MTK_GIC_EXT
+	help
+	  This enable support for MediaTek MT8173. If you need support
+	  for MediaTek MT8173, say Y here.
+	  Please note this also select ARCH_MEDIATEK, so driver depends
+	  on it can be selected.
+
+config ARCH_MT6735M
+	bool "MediaTek MT6735M"
+	select GENERIC_TIME
+	select GENERIC_CLOCKEVENTS
+	select ARCH_HAS_CPUFREQ
+	select ARM_AMBA
+	select CPU_V7
+	select HAVE_SMP
+	select NEED_MACH_MEMORY_H
+	select IRQ_DOMAIN
+	select IRQ_DOMAIN_DEBUG
+	select GENERIC_SCHED_CLOCK
+	select MTK_SYSTRACKER
+	select MTK_SYS_CIRQ
+	select MTK_EIC
+	select ARMV7_COMPAT
+	select ARMV7_COMPAT_CPUINFO
+	select CPU_IDLE
+	select ARM_MT6735_CPUIDLE
+	select MTK_GIC
+	select MTK_IRQ_NEW_DESIGN
+	select MTK_IRQ_NEW_DESIGN_DEBUG
+	select PINCTRL
+	select PINCTRL_MT6735
+	select MFD_SYSCON
+	select ARM64_ERRATUM_843419
+	select MTK_BASE_POWER
+	select MTK_POWER_GS
+	select MTK_CPU_STRESS
+	help
+	  This enable support for MediaTek MT6735M
+	  Support for k35mv1_64
+	  Support for k35mv1_64_op01
+	  Support for k35mv1_64_op02
+
 config ARCH_XGENE
 	bool "AppliedMicro X-Gene SOC Family"
 	help
 	  This enables support for AppliedMicro X-Gene SOC Family
 
 endmenu
+
+source "drivers/misc/mediatek/mach/Kconfig"
 
 menu "Bus support"
 
@@ -368,6 +668,65 @@ config ARM64_ERRATUM_845719
 
 	  If unsure, say Y.
 
+config ARM64_ERRATUM_836870
+	bool "Cortex-A53: 836870: Non-allocating reads might prevent a store exclusive from passing"
+	depends on ARM64
+	help
+	  This option enables the workaround for erratum 836870
+	  affecting Cortex-A53 MPCore with two or more processors (r0p0..r0p3).
+	  If a Cortex-A53 processor is executing a load and store exclusive instruction in a loop then there are certain conditions
+	  that are allowed to cause the store exclusive instruction to repeatedly fail. This includes another processor repeatedly
+	  writing to the same cache line. In addition to these allowed conditions, a non-allocating load from another processor migh
+	  also cause the store exclusive instruction to repeatedly fail.
+
+	  This walkaournd is to ensure system do not use non-allocating load. For 32 bit ATF and 64 bit project,
+	  master cpu's DTAH bit is set to 1 at preloader stage and set to 1 again after suspend through
+	  dormant driver in ATF. Slave cpus's DTAH bit is set to 1 at dormant driver in ATF stage.
+	  For 32 bit non-ATF project, Master cpu's DTAH bit is set to 1 at preloader stage and
+	  set to 1 again after suspend through dormant driver in kernel. Slave cpus's DTAH bit is set to 1
+	  by hotplug driver in kernel.
+
+	  In 64 bit project, this Kernel config do nothing since all patches are in ATF and preloader. and
+	  ATF and preloader are already default enable these patches.
+
+
+config ARM64_ERRATUM_843419
+	bool "Cortex-A53: 843419: A load or store might access an incorrect address"
+	default y
+	help
+	  This option builds kernel modules using the large memory model in
+	  order to avoid the use of the ADRP instruction, which can cause
+	  a subsequent memory access to use an incorrect address on Cortex-A53
+	  parts up to r0p4.
+
+	  Note that the kernel itself must be linked with a version of ld
+	  which fixes potentially affected ADRP instructions through the
+	  use of veneers.
+
+	  If unsure, say Y.
+
+config ARM64_ERRATUM_855872
+	bool "Cortex-A53: 855872: A Store-Exclusive instruction might pass when it should fail"
+	default y
+	help
+	  This option adds a DMB to before each LDAXR and LDXR to avoid conditions
+	  of erratum 855872 on Cortex-A53 parts up to r0p4.
+	  Because of this erratum, the processor which acquires lock might pass when it should
+	  fail.
+
+	  If unsure, say Y.
+
+config ARM64_ERRATUM_855873
+	bool "Cortex-A53: 855873: An eviction might overtake a cache clean operation"
+	default y
+	help
+	  This option adds an alternative code sequence to work around ARM
+	  erratum 855873 on Cortex-A53 parts up to r0p4.
+	  Because of this erratum, the processor might issue an eviction and
+	  an L2 cache clean operation to the interconnect in the wrong order.
+
+	  If unsure, say Y.
+
 endmenu
 
 
@@ -422,9 +781,9 @@ config ARM64_VA_BITS
 	default 48 if ARM64_VA_BITS_48
 
 config CPU_BIG_ENDIAN
-       bool "Build big-endian kernel"
-       help
-         Say Y if you plan on running a kernel in big-endian mode.
+	bool "Build big-endian kernel"
+	help
+	  Say Y if you plan on running a kernel in big-endian mode.
 
 config SCHED_MC
 	bool "Multi-core scheduler support"
@@ -526,6 +885,18 @@ config FORCE_MAX_ZONEORDER
 	int
 	default "14" if (ARM64_64K_PAGES && TRANSPARENT_HUGEPAGE)
 	default "11"
+
+config UNMAP_KERNEL_AT_EL0
+	bool "Unmap kernel when running in userspace (aka \"KAISER\")" if EXPERT
+	default n
+	help
+	  Speculation attacks against some high-performance processors can
+	  be used to bypass MMU permission checks and leak kernel data to
+	  userspace. This can be defended against by unmapping the kernel
+	  when running in userspace, mapping it back in on exception entry
+	  via a trampoline page in the vector table.
+
+	  If unsure, say Y.
 
 menuconfig ARMV8_DEPRECATED
 	bool "Emulate deprecated/obsolete ARMv8 instructions"
@@ -696,7 +1067,7 @@ config EFI
 	help
 	  This option provides support for runtime services provided
 	  by UEFI firmware (such as non-volatile variables, realtime
-          clock, and platform reset). A UEFI stub is also provided to
+	  clock, and platform reset). A UEFI stub is also provided to
 	  allow the kernel to be booted as an EFI application. This
 	  is only useful on systems that have UEFI firmware.
 
@@ -714,6 +1085,22 @@ config BUILD_ARM64_APPENDED_DTB_IMAGE_NAMES
 	help
 	  Space separated list of names of dtbs to append when
 	  building a concatenated Image.gz-dtb.
+
+config BUILD_ARM64_DTB_OVERLAY_IMAGE
+	bool "Build a device tree overlay image"
+	depends on OF
+	help
+	  Enabling this option will casue overlay device tree
+	  to be built by default.
+	  Overlay DT contains device-specific configurations.
+	  Please be aware that bootloader supports DT merging.
+
+config BUILD_ARM64_DTB_OVERLAY_IMAGE_NAMES
+	string "Default dtb overlay names"
+	depends on BUILD_ARM64_DTB_OVERLAY_IMAGE
+	help
+	  Space separated list of names of dtbs to append when
+	  building a concatenated overlay image
 
 config DMI
 	bool "Enable support for SMBIOS (DMI) tables"
@@ -763,6 +1150,11 @@ config ARCH_SUSPEND_POSSIBLE
 config ARM64_CPU_SUSPEND
 	def_bool PM_SLEEP
 
+config ARCH_HIBERNATION_POSSIBLE
+        bool
+        depends on MMU
+        default y if ARCH_SUSPEND_POSSIBLE
+
 endmenu
 
 menu "CPU Power Management"
@@ -770,22 +1162,6 @@ menu "CPU Power Management"
 source "drivers/cpuidle/Kconfig"
 
 source "drivers/cpufreq/Kconfig"
-
-config ARM64_ERRATUM_843419
-	bool "Cortex-A53: 843419: A load or store might access an incorrect address"
-	depends on MODULES
-	default y
-	help
-	  This option builds kernel modules using the large memory model in
-	  order to avoid the use of the ADRP instruction, which can cause
-	  a subsequent memory access to use an incorrect address on Cortex-A53
-	  parts up to r0p4.
-
-	  Note that the kernel itself must be linked with a version of ld
-	  which fixes potentially affected ADRP instructions through the
-	  use of veneers.
-
-	  If unsure, say Y.
 
 endmenu
 

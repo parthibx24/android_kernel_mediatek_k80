@@ -154,10 +154,18 @@ static int mmc_bus_suspend(struct device *dev)
 	if (dev->driver && drv->suspend) {
 		ret = drv->suspend(card);
 		if (ret)
-			return ret;
+			goto out;
 	}
 
 	ret = host->bus_ops->suspend(host);
+	/*
+	 * Restart queue if suspend failed
+	 */
+	if (ret) {
+		if (dev->driver && drv->resume)
+			(void)drv->resume(card);
+	}
+out:
 	return ret;
 }
 
@@ -278,6 +286,9 @@ struct mmc_card *mmc_alloc_card(struct mmc_host *host, struct device_type *type)
 	card->dev.bus = &mmc_bus_type;
 	card->dev.release = mmc_release_card;
 	card->dev.type = type;
+#ifdef MTK_BKOPS_IDLE_MAYA
+	spin_lock_init(&card->bkops_info.bkops_stats.lock);
+#endif
 
 	return card;
 }

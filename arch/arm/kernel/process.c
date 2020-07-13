@@ -262,6 +262,8 @@ void machine_power_off(void)
 	local_irq_disable();
 	smp_send_stop();
 
+	pr_emerg("machine_power_off, pm_power_off(%p)\n", pm_power_off);
+	dump_stack();
 	if (pm_power_off)
 		pm_power_off();
 }
@@ -287,6 +289,7 @@ void machine_restart(char *cmd)
 	 * out to the console drivers */
 	arm_machine_flush_console();
 
+	pr_emerg("machine_restart, arm_pm_restart(%p)\n", arm_pm_restart);
 	if (arm_pm_restart)
 		arm_pm_restart(reboot_mode, cmd);
 	else

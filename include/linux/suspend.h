@@ -201,21 +201,6 @@ struct platform_freeze_ops {
  */
 extern void suspend_set_ops(const struct platform_suspend_ops *ops);
 extern int suspend_valid_only_mem(suspend_state_t state);
-
-/* Suspend-to-idle state machnine. */
-enum freeze_state {
-	FREEZE_STATE_NONE,      /* Not suspended/suspending. */
-	FREEZE_STATE_ENTER,     /* Enter suspend-to-idle. */
-	FREEZE_STATE_WAKE,      /* Wake up from suspend-to-idle. */
-};
-
-extern enum freeze_state __read_mostly suspend_freeze_state;
-
-static inline bool idle_should_freeze(void)
-{
-	return unlikely(suspend_freeze_state == FREEZE_STATE_ENTER);
-}
-
 extern void freeze_set_ops(const struct platform_freeze_ops *ops);
 extern void freeze_wake(void);
 
@@ -243,7 +228,6 @@ extern int pm_suspend(suspend_state_t state);
 
 static inline void suspend_set_ops(const struct platform_suspend_ops *ops) {}
 static inline int pm_suspend(suspend_state_t state) { return -ENOSYS; }
-static inline bool idle_should_freeze(void) { return false; }
 static inline void freeze_set_ops(const struct platform_freeze_ops *ops) {}
 static inline void freeze_wake(void) {}
 #endif /* !CONFIG_SUSPEND */
@@ -348,6 +332,7 @@ extern bool system_entering_hibernation(void);
 extern bool hibernation_available(void);
 asmlinkage int swsusp_save(void);
 extern struct pbe *restore_pblist;
+extern bool system_entering_hibernation(void);
 #else /* CONFIG_HIBERNATION */
 static inline void register_nosave_region(unsigned long b, unsigned long e) {}
 static inline void register_nosave_region_late(unsigned long b, unsigned long e) {}
@@ -497,5 +482,16 @@ static inline void page_key_memorize(unsigned long *pfn) {}
 static inline void page_key_write(void *address) {}
 
 #endif /* !CONFIG_ARCH_SAVE_PAGE_KEYS */
+
+#ifdef CONFIG_MTK_HIBERNATION
+extern int pre_hibernate(void);
+extern int mtk_hibernate(void);
+extern int mtk_hibernate_abort(void);
+#ifdef CONFIG_TOI_CORE
+extern int hybrid_sleep_mode(void);
+#else
+static inline int hybrid_sleep_mode(void) { return 0; }
+#endif
+#endif /* CONFIG_MTK_HIBERNATION */
 
 #endif /* _LINUX_SUSPEND_H */

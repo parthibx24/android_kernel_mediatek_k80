@@ -483,10 +483,8 @@ static int magicmouse_input_configured(struct hid_device *hdev,
 		hid_err(hdev, "magicmouse setup input failed (%d)\n", ret);
 		/* clean msc->input to notify probe() of the failure */
 		msc->input = NULL;
-		return ret;
 	}
-
-	return 0;
+	return ret;
 }
 
 

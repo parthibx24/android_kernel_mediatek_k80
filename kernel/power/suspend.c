@@ -33,15 +33,15 @@
 
 #include "power.h"
 
+#define MTK_SOLUTION 1
+
 const char *pm_labels[] = { "mem", "standby", "freeze", NULL };
 const char *pm_states[PM_SUSPEND_MAX];
 
 static const struct platform_suspend_ops *suspend_ops;
 static const struct platform_freeze_ops *freeze_ops;
 static DECLARE_WAIT_QUEUE_HEAD(suspend_freeze_wait_head);
-
-enum freeze_state __read_mostly suspend_freeze_state;
-static DEFINE_SPINLOCK(suspend_freeze_lock);
+static bool suspend_freeze_wake;
 
 void freeze_set_ops(const struct platform_freeze_ops *ops)
 {
@@ -52,49 +52,22 @@ void freeze_set_ops(const struct platform_freeze_ops *ops)
 
 static void freeze_begin(void)
 {
-	suspend_freeze_state = FREEZE_STATE_NONE;
+	suspend_freeze_wake = false;
 }
 
 static void freeze_enter(void)
 {
-	spin_lock_irq(&suspend_freeze_lock);
-	if (pm_wakeup_pending())
-		goto out;
-
-	suspend_freeze_state = FREEZE_STATE_ENTER;
-	spin_unlock_irq(&suspend_freeze_lock);
-
-	get_online_cpus();
+	cpuidle_use_deepest_state(true);
 	cpuidle_resume();
-
-	/* Push all the CPUs into the idle loop. */
-	wake_up_all_idle_cpus();
-	pr_debug("PM: suspend-to-idle\n");
-	/* Make the current CPU wait so it can enter the idle loop too. */
-	wait_event(suspend_freeze_wait_head,
-		   suspend_freeze_state == FREEZE_STATE_WAKE);
-	pr_debug("PM: resume from suspend-to-idle\n");
-
+	wait_event(suspend_freeze_wait_head, suspend_freeze_wake);
 	cpuidle_pause();
-	put_online_cpus();
-
-	spin_lock_irq(&suspend_freeze_lock);
-
- out:
-	suspend_freeze_state = FREEZE_STATE_NONE;
-	spin_unlock_irq(&suspend_freeze_lock);
+	cpuidle_use_deepest_state(false);
 }
 
 void freeze_wake(void)
 {
-	unsigned long flags;
-
-	spin_lock_irqsave(&suspend_freeze_lock, flags);
-	if (suspend_freeze_state > FREEZE_STATE_NONE) {
-		suspend_freeze_state = FREEZE_STATE_WAKE;
-		wake_up(&suspend_freeze_wait_head);
-	}
-	spin_unlock_irqrestore(&suspend_freeze_lock, flags);
+	suspend_freeze_wake = true;
+	wake_up(&suspend_freeze_wait_head);
 }
 EXPORT_SYMBOL_GPL(freeze_wake);
 
@@ -464,6 +437,57 @@ static void suspend_finish(void)
 	pm_restore_console();
 }
 
+#if MTK_SOLUTION
+
+#define SYS_SYNC_TIMEOUT 2000
+
+static int sys_sync_ongoing;
+
+static void suspend_sys_sync(struct work_struct *work);
+static struct workqueue_struct *suspend_sys_sync_work_queue;
+DECLARE_WORK(suspend_sys_sync_work, suspend_sys_sync);
+
+static void suspend_sys_sync(struct work_struct *work)
+{
+	pr_debug("++\n");
+	sys_sync();
+	sys_sync_ongoing = 0;
+	pr_debug("--\n");
+}
+
+int suspend_syssync_enqueue(void)
+{
+	int timeout = 0;
+
+	if (suspend_sys_sync_work_queue == NULL) {
+		suspend_sys_sync_work_queue = create_singlethread_workqueue("fs_suspend_syssync");
+		if (suspend_sys_sync_work_queue == NULL)
+			pr_err("fs_suspend_syssync workqueue create failed\n");
+	}
+
+	while (timeout < SYS_SYNC_TIMEOUT) {
+		if (!sys_sync_ongoing)
+			break;
+		msleep(100);
+		timeout += 100;
+	}
+
+	if (!sys_sync_ongoing) {
+		sys_sync_ongoing = 1;
+		queue_work(suspend_sys_sync_work_queue, &suspend_sys_sync_work);
+		while (timeout < SYS_SYNC_TIMEOUT) {
+			if (!sys_sync_ongoing)
+				return 0;
+			msleep(100);
+			timeout += 100;
+		}
+	}
+
+	return -EBUSY;
+}
+
+#endif
+
 /**
  * enter_state - Do common work needed to enter system sleep state.
  * @state: System sleep state to enter.
@@ -496,7 +520,15 @@ static int enter_state(suspend_state_t state)
 
 	trace_suspend_resume(TPS("sync_filesystems"), 0, true);
 	printk(KERN_INFO "PM: Syncing filesystems ... ");
+#if MTK_SOLUTION
+	error = suspend_syssync_enqueue();
+	if (error) {
+		pr_err("sys_sync timeout.\n");
+		goto Unlock;
+	}
+#else
 	sys_sync();
+#endif
 	printk("done.\n");
 	trace_suspend_resume(TPS("sync_filesystems"), 0, false);
 

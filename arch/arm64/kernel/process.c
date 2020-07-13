@@ -79,6 +79,16 @@ void arch_cpu_idle(void)
 	local_irq_enable();
 }
 
+void arch_cpu_idle_enter(void)
+{
+	idle_notifier_call_chain(IDLE_START);
+}
+
+void arch_cpu_idle_exit(void)
+{
+	idle_notifier_call_chain(IDLE_END);
+}
+
 #ifdef CONFIG_HOTPLUG_CPU
 void arch_cpu_idle_dead(void)
 {
@@ -122,6 +132,8 @@ void machine_power_off(void)
 {
 	local_irq_disable();
 	smp_send_stop();
+	pr_emerg("machine_power_off, pm_power_off(%p)\n", pm_power_off);
+	dump_stack();
 	if (pm_power_off)
 		pm_power_off();
 }
@@ -142,6 +154,7 @@ void machine_restart(char *cmd)
 	smp_send_stop();
 
 	/* Now call the architecture specific reboot code. */
+	pr_emerg("machine_restart, arm_pm_restart(%p)\n", arm_pm_restart);
 	if (arm_pm_restart)
 		arm_pm_restart(reboot_mode, cmd);
 	else
@@ -353,25 +366,18 @@ int copy_thread(unsigned long clone_flags, unsigned long stack_start,
 
 static void tls_thread_switch(struct task_struct *next)
 {
-	unsigned long tpidr, tpidrro;
-
 	if (!is_compat_task()) {
+		unsigned long tpidr;
 		asm("mrs %0, tpidr_el0" : "=r" (tpidr));
 		current->thread.tp_value = tpidr;
 	}
 
-	if (is_compat_thread(task_thread_info(next))) {
-		tpidr = 0;
-		tpidrro = next->thread.tp_value;
-	} else {
-		tpidr = next->thread.tp_value;
-		tpidrro = 0;
-	}
+	if (is_compat_thread(task_thread_info(next)))
+		write_sysreg(next->thread.tp_value, tpidrro_el0);
+	else if (!arm64_kernel_unmapped_at_el0())
+		write_sysreg(0, tpidrro_el0);
 
-	asm(
-	"	msr	tpidr_el0, %0\n"
-	"	msr	tpidrro_el0, %1"
-	: : "r" (tpidr), "r" (tpidrro));
+	write_sysreg(next->thread.tp_value, tpidr_el0);
 }
 
 /* Restore the UAO state depending on next's addr_limit */

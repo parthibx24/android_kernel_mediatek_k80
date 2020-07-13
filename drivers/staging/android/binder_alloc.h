@@ -25,6 +25,7 @@
 
 extern struct list_lru binder_alloc_lru;
 struct binder_transaction;
+#define BINDER_MIN_ALLOC (1 * PAGE_SIZE)
 
 /**
  * struct binder_buffer - buffer used for binder transactions

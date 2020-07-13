@@ -301,6 +301,9 @@ EXPORT_SYMBOL(sysctl_tcp_wmem);
 atomic_long_t tcp_memory_allocated;	/* Current allocated memory. */
 EXPORT_SYMBOL(tcp_memory_allocated);
 
+int sysctl_tcp_ack_number __read_mostly = 1;
+EXPORT_SYMBOL(sysctl_tcp_ack_number);
+
 /*
  * Current number of TCP sockets.
  */
@@ -590,6 +593,20 @@ int tcp_ioctl(struct sock *sk, int cmd, unsigned long arg)
 		else
 			answ = tp->write_seq - tp->snd_nxt;
 		break;
+				/* MTK_NET_CHANGES */
+case SIOCKILLSOCK:
+{
+	struct uid_err uid_e;
+
+	if (copy_from_user(&uid_e, (char __user *)arg, sizeof(uid_e)))
+		return -EFAULT;
+	pr_debug("SIOCKILLSOCK uid = %d , err = %d", uid_e.appuid, uid_e.errNum);
+	if (uid_e.errNum == 0)
+		tcp_v4_handle_retrans_time_by_uid(uid_e);
+	else
+		tcp_v4_reset_connections_by_uid(uid_e);
+	return 0;
+}
 	default:
 		return -ENOIOCTLCMD;
 	}
@@ -1424,7 +1441,7 @@ static void tcp_cleanup_rbuf(struct sock *sk, int copied)
 		    * receive. */
 		if (icsk->icsk_ack.blocked ||
 		    /* Once-per-two-segments ACK was not sent by tcp_input.c */
-		    tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
+		    tp->rcv_nxt - tp->rcv_wup > sysctl_tcp_ack_number * icsk->icsk_ack.rcv_mss ||
 		    /*
 		     * If this read emptied read buffer, we send ACK, if
 		     * connection is not bidirectional, user drained
@@ -2565,7 +2582,7 @@ static int do_tcp_setsockopt(struct sock *sk, int level,
 		/* Translate value in seconds to number of retransmits */
 		icsk->icsk_accept_queue.rskq_defer_accept =
 			secs_to_retrans(val, TCP_TIMEOUT_INIT / HZ,
-					TCP_RTO_MAX / HZ);
+					sysctl_tcp_rto_max / HZ);
 		break;
 
 	case TCP_WINDOW_CLAMP:
@@ -2788,7 +2805,7 @@ static int do_tcp_getsockopt(struct sock *sk, int level,
 		break;
 	case TCP_DEFER_ACCEPT:
 		val = retrans_to_secs(icsk->icsk_accept_queue.rskq_defer_accept,
-				      TCP_TIMEOUT_INIT / HZ, TCP_RTO_MAX / HZ);
+				      TCP_TIMEOUT_INIT / HZ, sysctl_tcp_rto_max / HZ);
 		break;
 	case TCP_WINDOW_CLAMP:
 		val = tp->window_clamp;

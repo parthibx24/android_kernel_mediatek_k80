@@ -291,16 +291,16 @@ sub Dhi()   { shift=~m|q([1]?[0-9])|?"d".($1*2+1):"";   }
 
 sub AUTOLOAD()          # thunk [simplified] x86-style perlasm
 { my $opcode = $AUTOLOAD; $opcode =~ s/.*:://; $opcode =~ s/_/\./;
-  my $arg = pop;
-    $arg = "#$arg" if ($arg*1 eq $arg);
-    $code .= "\t$opcode\t".join(',',@_,$arg)."\n";
+	my $arg = pop;
+	$arg = "#$arg" if ($arg*1 eq $arg);
+	$code .= "\t$opcode\t".join(',',@_,$arg)."\n";
 }
 
 sub Xupdate()
 { use integer;
-  my $body = shift;
-  my @insns = (&$body,&$body,&$body,&$body);
-  my ($a,$b,$c,$d,$e,$f,$g,$h);
+	my $body = shift;
+	my @insns = (&$body,&$body,&$body,&$body);
+	my ($a,$b,$c,$d,$e,$f,$g,$h);
 
 	&vext_8		($T0,@X[0],@X[1],4);	# X[1..4]
 	 eval(shift(@insns));
@@ -399,9 +399,9 @@ sub Xupdate()
 
 sub Xpreload()
 { use integer;
-  my $body = shift;
-  my @insns = (&$body,&$body,&$body,&$body);
-  my ($a,$b,$c,$d,$e,$f,$g,$h);
+	my $body = shift;
+	my @insns = (&$body,&$body,&$body,&$body);
+	my ($a,$b,$c,$d,$e,$f,$g,$h);
 
 	 eval(shift(@insns));
 	 eval(shift(@insns));
@@ -683,7 +683,7 @@ close SELF;
 	"sha256h"	=> 0xf3000c40,	"sha256h2"	=> 0xf3100c40,
 	"sha256su0"	=> 0xf3ba03c0,	"sha256su1"	=> 0xf3200c40	);
 
-    sub unsha256 {
+	sub unsha256 {
 	my ($mnemonic,$arg)=@_;
 
 	if ($arg =~ m/q([0-9]+)(?:,\s*q([0-9]+))?,\s*q([0-9]+)/o) {
@@ -698,7 +698,7 @@ close SELF;
 			($word>>16)&0xff,($word>>24)&0xff,
 			$mnemonic,$arg;
 	}
-    }
+		}
 }
 
 foreach (split($/,$code)) {

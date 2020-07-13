@@ -2,6 +2,9 @@
 # Makefile for the linux kernel.
 #
 
+subdir-ccflags-y += -Werror
+ccflags-y += -Idrivers/misc/mediatek/mtprof/
+
 obj-y                          := main.o version.o mounts.o
 obj-y                          += noinitramfs.o
 obj-$(CONFIG_BLK_DEV_INITRD)   += initramfs.o

@@ -40,3 +40,5 @@ config ION_POOL_CACHE_POLICY
 	help
 	  Choose this option if need to explicity set cache policy of the
 	  pages in the page pool.
+
+source "drivers/staging/android/ion/mtk/Kconfig"

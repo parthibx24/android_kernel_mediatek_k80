@@ -29,8 +29,11 @@
 #define ARM64_HAS_PAN				4
 #define ARM64_HAS_UAO				5
 #define ARM64_ALT_PAN_NOT_UAO			6
+#define ARM64_WORKAROUND_855872			7
 
-#define ARM64_NCAPS				7
+#define ARM64_UNMAP_KERNEL_AT_EL0		23
+
+#define ARM64_NCAPS				24
 
 #ifndef __ASSEMBLY__
 
@@ -109,7 +112,7 @@ static inline bool cpus_have_cap(unsigned int num)
 static inline void cpus_set_cap(unsigned int num)
 {
 	if (num >= ARM64_NCAPS)
-		pr_warn("Attempt to set an illegal CPU capability (%d >= %d)\n",
+		printk(KERN_WARNING"Attempt to set an illegal CPU capability (%d >= %d)\n",
 			num, ARM64_NCAPS);
 	else
 		__set_bit(num, cpu_hwcaps);

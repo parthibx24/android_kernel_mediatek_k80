@@ -330,6 +330,8 @@ static void __kthread_bind_mask(struct task_struct *p, const struct cpumask *mas
 	unsigned long flags;
 
 	if (!wait_task_inactive(p, state)) {
+		pr_warn("[%s] comm=%s pid=%d task_state=%lu state=%lu flag=%lu\n",
+			__func__, p->comm, p->pid, p->state, state, to_kthread(p)->flags);
 		WARN_ON(1);
 		return;
 	}
