@@ -1,0 +1,1 @@
+obj-y += ili9806e_fwvga_dsi_vdo_zgd.o
