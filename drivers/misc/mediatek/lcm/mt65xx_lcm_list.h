@@ -294,6 +294,8 @@ extern struct LCM_DRIVER nt36672_fhdp_dsi_vdo_auo_lcm_drv;
 extern struct LCM_DRIVER nt36672_fhdp_dsi_vdo_auo_laneswap_lcm_drv;
 extern struct LCM_DRIVER hx8392a_dsi_cmd_hdplus_lcm_drv;
 extern struct LCM_DRIVER ili9806e_fwvga_dsi_vdo_zgd_lcm_drv;
+extern struct LCM_DRIVER ili9806e_fwvga_dsi_vdo_zgd_grayline_lcm_drv;
+
 #ifdef BUILD_LK
 extern void mdelay(unsigned long msec);
 #endif

@@ -32,6 +32,10 @@ struct LCM_DRIVER *lcm_driver_list[] = {
 	&ili9806e_fwvga_dsi_vdo_zgd_lcm_drv,
 #endif
 
+#if defined(ILI9806E_FWVGA_DSI_VDO_ZGD_GRAYLINE)
+	&ili9806e_fwvga_dsi_vdo_zgd_grayline_lcm_drv,
+#endif
+
 #if defined(ILI9881C_HD_DSI_VDO_ILITEK_NT50358_3LANE)
 	&ili9881c_hd_dsi_vdo_ilitek_nt50358_3lane_lcm_drv,
 #endif
