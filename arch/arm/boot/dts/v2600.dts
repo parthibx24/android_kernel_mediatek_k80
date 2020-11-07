@@ -550,13 +550,4 @@
 
 #include <k80_bsp/cust.dtsi>
 
-&i2c1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	cap_touch_mtk:cap_touch@38 {
-		compatible = "mediatek,cap_touch";
-		reg = <0x38>;
-		status = "okay";
-	};
-}
 /*End of this file, DO NOT ADD ANYTHING HERE*/
